@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTC (Crypto) investment</title>
+    <title>当前周期 “锚与帆” 实战模拟器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,778 +12,364 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827;
+            background-color: #030712;
             color: #d1d5db;
         }
         .card {
-            background-color: #1f2937;
+            background-color: #111827;
             border-radius: 0.75rem;
             padding: 1.5rem;
             border: 1px solid #374151;
         }
-        .asset-card {
-            background-color: #374151;
-            border-radius: 0.75rem;
+        .input-group {
+            background-color: #1f2937;
             padding: 1rem;
+            border-radius: 0.5rem;
             border: 1px solid #4b5563;
         }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 280px;
+        input[type="number"] {
             background-color: #374151;
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -140px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-            font-weight: 400;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
+            border: 1px solid #6b7280;
+            color: #f3f4f6;
         }
         .btn {
-            background-color: #3b82f6;
+            background-color: #2563eb;
             transition: background-color 0.3s;
         }
         .btn:hover {
-            background-color: #2563eb;
+            background-color: #1d4ed8;
         }
-        .btn:disabled {
-            background-color: #4b5563;
-            cursor: not-allowed;
+        .phase-card {
+            background-color: #1f2937;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
         }
-        .loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3b82f6;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        input[type="number"] {
-            background-color: #4b5563;
-            border: 1px solid #6b7280;
+        .summary-card {
+             background-color: #1f2937;
+            border: 1px solid #f59e0b;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto space-y-8">
         <header class="text-center space-y-2">
-            <h1 class="text-3xl md:text-4xl font-bold text-white">BTC (Crypto) investment</h1>
-            <p class="text-lg text-gray-400">基于你的完整投资策略体系构建 (仪表盘版)</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-white">当前周期 “锚与帆” 实战模拟器</h1>
+            <p class="text-lg text-gray-400">基于您的真实持仓，推演本周期财富增长</p>
         </header>
 
-        <!-- 顶部：资产状态与牛顶预测 -->
         <div class="card">
-            <h2 class="text-xl font-semibold text-white mb-4 text-center">资产状态与牛顶预测</h2>
-            <p id="priceStatus" class="text-xs text-center text-gray-400 h-4 mb-4"></p>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6 p-4 rounded-lg bg-gray-900 border border-gray-700">
-                <div>
-                    <h3 class="text-sm font-medium text-gray-400">当前总资产 (BTC)</h3>
-                    <p id="totalCurrentBtcEq" class="text-2xl font-bold text-white">...</p>
-                </div>
-                <div>
-                    <h3 class="text-sm font-medium text-gray-400">牛顶目标 (BTC)</h3>
-                    <p class="text-2xl font-bold text-green-400">
-                        <span id="totalBullBtcEq">...</span>
-                        <span id="totalBullBtcEqPercent" class="text-lg font-semibold text-green-500 ml-2"></span>
-                    </p>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-sm font-medium text-gray-400">当前总价值 (USD)</h3>
-                    <p id="totalCurrentUsdValue" class="text-2xl font-bold text-white">...</p>
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-sm font-medium text-gray-400">牛顶总价值 (USD)</h3>
-                     <p class="text-2xl font-bold text-green-400">
-                        <span id="totalBullUsdValue">...</span>
-                        <span id="totalBullUsdValuePercent" class="text-lg font-semibold text-green-500 ml-2"></span>
-                    </p>
+             <h2 class="text-xl font-semibold text-white mb-4">当前周期策略核心</h2>
+             <p class="text-sm text-gray-400 leading-relaxed">
+                本模拟器基于您的<strong class="text-amber-400">当前实际持仓</strong>进行演算，并严格遵守您为本周期制定的策略：<br>
+                <strong class="text-blue-400">⚓ 锚 (核心BTC仓位)</strong>: 您持有的全部BTC，在本轮牛市顶部<strong class="text-amber-400">永不卖出</strong>。<br>
+                <strong class="text-green-400">⛵ 帆 (山寨币仓位)</strong>: 您持有的全部山寨币 (ETH, STETH, ADA)，在牛市顶部<strong class="text-amber-400">全部卖出为USDT</strong>，以换取最大化的弹药。
+             </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧：参数输入 -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="card sticky top-8">
+                    <h2 class="text-xl font-semibold text-white mb-4">参数输入</h2>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <h3 class="text-sm font-medium text-gray-300 mb-2"><strong>起点:</strong> 当前持仓 (可编辑)</h3>
+                            <label for="currentBtc" class="block text-xs mt-2">BTC (锚 ⚓)</label>
+                            <input type="number" id="currentBtc" value="0.0871" class="w-full mt-1 p-2 rounded-md">
+                            
+                            <label for="currentEth" class="block text-xs mt-2">ETH + STETH (帆 ⛵)</label>
+                            <input type="number" id="currentEth" value="6.8145" class="w-full mt-1 p-2 rounded-md">
+                            
+                            <label for="currentAda" class="block text-xs mt-2">ADA (帆 ⛵)</label>
+                            <input type="number" id="currentAda" value="23352.7045" class="w-full mt-1 p-2 rounded-md">
+                        </div>
+
+                        <div class="input-group">
+                             <h3 class="text-sm font-medium text-gray-300 mb-2"><strong>历史周期参考:</strong> 上一轮牛顶</h3>
+                             <label for="previousBullBtcPrice" class="block text-xs mt-2">2021年 BTC 牛顶价格 (USD)</label>
+                             <input type="number" id="previousBullBtcPrice" value="69000" class="w-full mt-1 p-2 rounded-md">
+                        </div>
+
+                        <div class="input-group">
+                            <h3 class="text-sm font-medium text-gray-300 mb-2"><strong>收获期:</strong> 牛市顶部目标价 (USD)</h3>
+                            <label for="bullBtcPrice" class="block text-xs mt-2">BTC 价格</label>
+                            <input type="number" id="bullBtcPrice" value="150000" class="w-full mt-1 p-2 rounded-md">
+                            <label for="bullEthPrice" class="block text-xs mt-2">ETH / STETH 价格</label>
+                            <input type="number" id="bullEthPrice" value="8000" class="w-full mt-1 p-2 rounded-md">
+                             <label for="bullAdaPrice" class="block text-xs mt-2">ADA 价格</label>
+                            <input type="number" id="bullAdaPrice" value="5" class="w-full mt-1 p-2 rounded-md">
+                        </div>
+
+                        <div class="input-group">
+                             <h3 class="text-sm font-medium text-gray-300 mb-2"><strong>重新播种:</strong> 下一轮熊底抄底价 (USD)</h3>
+                             <label for="bearBtcPrice2" class="block text-xs mt-2">BTC 价格 (默认关联上一轮牛顶)</label>
+                             <input type="number" id="bearBtcPrice2" value="69000" class="w-full mt-1 p-2 rounded-md">
+                        </div>
+                    </div>
+                    <button id="runBtn" class="w-full btn text-white font-bold py-3 px-4 rounded-lg text-lg mt-6">
+                        🚀 运行本周期模拟
+                    </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- BTC Panel -->
-                <div class="asset-card space-y-3">
-                     <div class="flex items-center space-x-2">
-                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" alt="BTC icon" class="h-6 w-6">
-                        <span class="text-lg font-bold text-white">BTC</span>
-                    </div>
-                    <div class="text-sm">
-                        <label>持有量:</label> <input type="number" id="btcHoldings" value="0.0871" class="w-full p-1 rounded text-sm mt-1">
-                        <label class="mt-2 block">单位成本:</label> <input type="number" id="btcCost" value="96656.99" class="w-full p-1 rounded text-sm mt-1">
-                        <p class="mt-2">当前价值: <span id="btcCurrentValue" class="font-semibold text-white">...</span></p>
-                    </div>
-                    <hr class="border-gray-500">
-                    <div class="text-sm">
-                        <label>牛顶目标价:</label> <input type="number" id="btcTargetPrice" value="150000" class="w-full p-1 rounded text-sm mt-1" disabled>
-                        <p class="mt-2">牛顶总价值: <span id="btcBullValue" class="font-semibold text-green-400">...</span><span id="btcBullValuePercent" class="text-xs text-green-500 font-normal ml-2"></span></p>
-                        <p class="mt-1">牛顶BTC等值: <span id="btcBullBtcEq" class="font-semibold text-green-400">...</span></p>
-                    </div>
-                </div>
-                 <!-- ETH Panel -->
-                <div class="asset-card space-y-3">
-                      <div class="flex items-center space-x-2">
-                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png" alt="ETH icon" class="h-6 w-6">
-                        <span class="text-lg font-bold text-white">ETH</span>
-                    </div>
-                    <div class="text-sm">
-                        <label>持有量:</label> <input type="number" id="ethHoldings" value="6.8145" class="w-full p-1 rounded text-sm mt-1">
-                        <label class="mt-2 block">单位成本:</label> <input type="number" id="ethCost" value="2903.42" class="w-full p-1 rounded text-sm mt-1">
-                        <p class="mt-2">当前价值: <span id="ethCurrentValue" class="font-semibold text-white">...</span></p>
-                        <p class="mt-1">当前BTC等值: <span id="ethCurrentBtcEq" class="font-semibold text-white">...</span></p>
-                    </div>
-                    <hr class="border-gray-500">
-                    <div class="text-sm">
-                        <label>牛顶目标价:</label> <input type="number" id="ethTargetPrice" value="8000" class="w-full p-1 rounded text-sm mt-1">
-                        <p class="mt-2">牛顶总价值: <span id="ethBullValue" class="font-semibold text-green-400">...</span><span id="ethBullValuePercent" class="text-xs text-green-500 font-normal ml-2"></span></p>
-                        <p class="mt-1">牛顶BTC等值: <span id="ethBullBtcEq" class="font-semibold text-green-400">...</span><span id="ethBullBtcEqPercent" class="text-xs text-green-500 font-normal ml-2"></span></p>
-                    </div>
-                </div>
-                 <!-- ADA Panel -->
-                <div class="asset-card space-y-3">
-                    <div class="flex items-center space-x-2">
-                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png" alt="ADA icon" class="h-6 w-6">
-                        <span class="text-lg font-bold text-white">ADA</span>
-                    </div>
-                   <div class="text-sm">
-                        <label>持有量:</label> <input type="number" id="adaHoldings" value="23352.7045" class="w-full p-1 rounded text-sm mt-1">
-                        <label class="mt-2 block">单位成本:</label> <input type="number" id="adaCost" value="0.84" class="w-full p-1 rounded text-sm mt-1">
-                        <p class="mt-2">当前价值: <span id="adaCurrentValue" class="font-semibold text-white">...</span></p>
-                        <p class="mt-1">当前BTC等值: <span id="adaCurrentBtcEq" class="font-semibold text-white">...</span></p>
-                    </div>
-                    <hr class="border-gray-500">
-                    <div class="text-sm">
-                        <label>牛顶目标价:</label> <input type="number" id="adaTargetPrice" value="5" class="w-full p-1 rounded text-sm mt-1">
-                        <p class="mt-2">牛顶总价值: <span id="adaBullValue" class="font-semibold text-green-400">...</span><span id="adaBullValuePercent" class="text-xs text-green-500 font-normal ml-2"></span></p>
-                        <p class="mt-1">牛顶BTC等值: <span id="adaBullBtcEq" class="font-semibold text-green-400">...</span><span id="adaBullBtcEqPercent" class="text-xs text-green-500 font-normal ml-2"></span></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 底部：参数与结果 -->
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <!-- 左侧：核心策略参数 -->
-            <div class="lg:col-span-1 space-y-6">
-                 <div class="card">
-                    <h2 class="text-xl font-semibold text-white mb-4 text-center">核心策略参数</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="monthlyDCA" class="block text-sm font-medium">每月定投 (欧元)</label>
-                            <input type="number" id="monthlyDCA" value="1000" class="w-full mt-1 p-2 rounded-md">
-                        </div>
-                        <div>
-                            <label for="supercyclePercent" class="block text-sm font-medium">
-                                超级周期仓位 (%)
-                                <div class="tooltip">
-                                    <span class="ml-1 text-xs bg-gray-600 rounded-full px-2 py-0.5 cursor-pointer">?</span>
-                                    <span class="tooltiptext">在牛顶卖出时，保留总资产的N%作为对冲“超级周期”风险的钻石手保险仓位。</span>
-                                </div>
-                            </label>
-                            <input type="number" id="supercyclePercent" value="30" class="w-full mt-1 p-2 rounded-md">
-                        </div>
-                         <div>
-                            <label for="cashReservePercent" class="block text-sm font-medium">
-                                熊底现金储备 (%)
-                                <div class="tooltip">
-                                    <span class="ml-1 text-xs bg-gray-600 rounded-full px-2 py-0.5 cursor-pointer">?</span>
-                                    <span class="tooltiptext">在熊底使用稳定币买入BTC时，保留N%的现金作为黑天鹅事件的预备金。</span>
-                                </div>
-                            </label>
-                            <input type="number" id="cashReservePercent" value="10" class="w-full mt-1 p-2 rounded-md">
-                        </div>
-                        <div>
-                           <label for="c1BullTop" class="block text-sm font-medium">牛顶 BTC 价格 (USD)</label>
-                           <input type="number" id="c1BullTop" value="150000" class="w-full mt-1 p-2 rounded-md">
-                        </div>
-                        <div>
-                           <label for="c1BearBottom" class="block text-sm font-medium">熊底 BTC 价格 (USD)</label>
-                           <input type="number" id="c1BearBottom" value="69000" class="w-full mt-1 p-2 rounded-md">
-                        </div>
-                    </div>
-                </div>
-                <button id="runSimulationBtn" class="w-full btn text-white font-bold py-3 px-4 rounded-lg text-lg flex items-center justify-center" disabled>
-                    <span id="btnText">获取实时价格...</span>
-                </button>
-            </div>
-            
             <!-- 右侧：模拟结果 -->
-            <div class="lg:col-span-4 space-y-6">
+            <div class="lg:col-span-2 space-y-6">
                 <div class="card">
-                    <h2 class="text-xl font-semibold text-white mb-4 text-center">模拟结果</h2>
-                    <div id="results" class="space-y-4 text-gray-300">
-                        请在左侧设定参数，然后点击“运行模拟”以查看结果。
+                    <h2 class="text-xl font-semibold text-white mb-4 text-center">本周期演算流程</h2>
+                    <div id="results" class="space-y-6 text-gray-300">
+                        <p class="text-center">请在左侧设定牛顶与熊底的目标价，然后点击“运行模拟”。</p>
                     </div>
                 </div>
-                 <div class="card">
-                    <h2 class="text-xl font-semibold text-white mb-4 text-center">资产增长可视化</h2>
-                    <canvas id="growthChart"></canvas>
+                <div class="card">
+                    <h2 class="text-xl font-semibold text-white mb-4 text-center">BTC总资产增长可视化</h2>
+                    <div class="h-64">
+                         <canvas id="growthChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
 <script>
-    // --- DOM Elements ---
     const elements = {
-        btcHoldings: document.getElementById('btcHoldings'),
-        ethHoldings: document.getElementById('ethHoldings'),
-        adaHoldings: document.getElementById('adaHoldings'),
-        btcCost: document.getElementById('btcCost'),
-        ethCost: document.getElementById('ethCost'),
-        adaCost: document.getElementById('adaCost'),
-        btcTargetPrice: document.getElementById('btcTargetPrice'),
-        ethTargetPrice: document.getElementById('ethTargetPrice'),
-        adaTargetPrice: document.getElementById('adaTargetPrice'),
-        monthlyDCA: document.getElementById('monthlyDCA'),
-        supercyclePercent: document.getElementById('supercyclePercent'),
-        cashReservePercent: document.getElementById('cashReservePercent'),
-        c1BullTop: document.getElementById('c1BullTop'),
-        c1BearBottom: document.getElementById('c1BearBottom'),
-        runSimulationBtn: document.getElementById('runSimulationBtn'),
+        currentBtc: document.getElementById('currentBtc'),
+        currentEth: document.getElementById('currentEth'),
+        currentAda: document.getElementById('currentAda'),
+        previousBullBtcPrice: document.getElementById('previousBullBtcPrice'),
+        bullBtcPrice: document.getElementById('bullBtcPrice'),
+        bullEthPrice: document.getElementById('bullEthPrice'),
+        bullAdaPrice: document.getElementById('bullAdaPrice'),
+        bearBtcPrice2: document.getElementById('bearBtcPrice2'),
+        runBtn: document.getElementById('runBtn'),
         results: document.getElementById('results'),
         chartCtx: document.getElementById('growthChart').getContext('2d'),
-        priceStatus: document.getElementById('priceStatus'),
-        btnText: document.getElementById('btnText'),
-        // Output fields
-        totalCurrentBtcEq: document.getElementById('totalCurrentBtcEq'),
-        totalBullBtcEq: document.getElementById('totalBullBtcEq'),
-        totalCurrentUsdValue: document.getElementById('totalCurrentUsdValue'),
-        totalBullUsdValue: document.getElementById('totalBullUsdValue'),
-        totalBullBtcEqPercent: document.getElementById('totalBullBtcEqPercent'),
-        totalBullUsdValuePercent: document.getElementById('totalBullUsdValuePercent'),
-        btcCurrentValue: document.getElementById('btcCurrentValue'),
-        ethCurrentValue: document.getElementById('ethCurrentValue'),
-        adaCurrentValue: document.getElementById('adaCurrentValue'),
-        ethCurrentBtcEq: document.getElementById('ethCurrentBtcEq'),
-        adaCurrentBtcEq: document.getElementById('adaCurrentBtcEq'),
-        btcBullValue: document.getElementById('btcBullValue'),
-        ethBullValue: document.getElementById('ethBullValue'),
-        adaBullValue: document.getElementById('adaBullValue'),
-        btcBullValuePercent: document.getElementById('btcBullValuePercent'),
-        ethBullValuePercent: document.getElementById('ethBullValuePercent'),
-        adaBullValuePercent: document.getElementById('adaBullValuePercent'),
-        btcBullBtcEq: document.getElementById('btcBullBtcEq'),
-        ethBullBtcEq: document.getElementById('ethBullBtcEq'),
-        adaBullBtcEq: document.getElementById('adaBullBtcEq'),
-        ethBullBtcEqPercent: document.getElementById('ethBullBtcEqPercent'),
-        adaBullBtcEqPercent: document.getElementById('adaBullBtcEqPercent'),
     };
-    
+
     let growthChart;
     let currentPrices = {};
 
-    // --- Helper Functions ---
-    function formatNumber(num, decimals = 0) {
+    function formatNum(num, decimals = 2) {
         if (typeof num !== 'number' || isNaN(num)) return '...';
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals
         }).format(num);
     }
-    
-    function btcEquivalentOf(portfolio, prices) {
-        if (!prices.btc || prices.btc === 0) return 0;
-        return portfolio.btc + (portfolio.eth * (prices.eth / prices.btc)) + (portfolio.ada * (prices.ada / prices.btc));
-    }
 
-
-    // --- Price Fetching & UI Update ---
-    async function fetchPrices() {
-        elements.btnText.innerHTML = `<span class="loader loader-inline"></span><span>正在更新价格...</span>`;
-        elements.runSimulationBtn.disabled = true;
-        elements.priceStatus.textContent = '正在从 CoinGecko 获取实时价格...';
-        
+    async function fetchPricesAndRun() {
         try {
             const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,cardano&vs_currencies=usd');
-            if (!response.ok) throw new Error(`API 请求失败: ${response.status}`);
+            if (!response.ok) throw new Error('API request failed');
             const data = await response.json();
-            
             currentPrices = {
                 btc: data.bitcoin.usd,
                 eth: data.ethereum.usd,
-                ada: data.cardano.usd
+                ada: data.cardano.usd,
             };
-
-            elements.priceStatus.textContent = `价格已于 ${new Date().toLocaleTimeString()} 更新。`;
-            elements.btnText.innerHTML = `🚀 运行模拟`;
-            elements.runSimulationBtn.disabled = false;
-            updateDashboard();
-            runSimulation(); // Auto-run on load
-
         } catch (error) {
-            console.error("获取价格失败:", error);
-            elements.priceStatus.textContent = '价格获取失败，请稍后重试。';
-            elements.btnText.innerHTML = `价格获取失败`;
+            console.error("Price fetch failed:", error);
+            elements.results.innerHTML = `<p class="text-center text-red-400">无法获取实时价格，请稍后重试。</p>`;
+            return;
         }
+        setBearBottomDefault();
+        runSimulation();
     }
     
-    function updateDashboard() {
-        if (!currentPrices.btc) return;
-
-        const holdings = {
-            btc: parseFloat(elements.btcHoldings.value) || 0,
-            eth: parseFloat(elements.ethHoldings.value) || 0,
-            ada: parseFloat(elements.adaHoldings.value) || 0
-        };
-        const targets = {
-            btc: parseFloat(elements.c1BullTop.value) || 0,
-            eth: parseFloat(elements.ethTargetPrice.value) || 0,
-            ada: parseFloat(elements.adaTargetPrice.value) || 0
-        };
-
+    function runSimulation() {
+        // --- 1. 获取输入参数 ---
+        const bullBtcPrice = parseFloat(elements.bullBtcPrice.value) || 0;
+        const bullEthPrice = parseFloat(elements.bullEthPrice.value) || 0;
+        const bullAdaPrice = parseFloat(elements.bullAdaPrice.value) || 0;
+        const bearBtcPrice2 = parseFloat(elements.bearBtcPrice2.value) || 0;
+        
+        // --- 2. 播种期 (当前状态) ---
+        const anchorBtc = parseFloat(elements.currentBtc.value) || 0;
+        const sailEth = parseFloat(elements.currentEth.value) || 0;
+        const sailAda = parseFloat(elements.currentAda.value) || 0;
+        
+        // --- 2.1 起点可视化计算 ---
         const currentValues = {
-            btc: holdings.btc * currentPrices.btc,
-            eth: holdings.eth * currentPrices.eth,
-            ada: holdings.ada * currentPrices.ada,
+            btc: anchorBtc * currentPrices.btc,
+            eth: sailEth * currentPrices.eth,
+            ada: sailAda * currentPrices.ada,
         };
-        const bullValues = {
-            btc: holdings.btc * targets.btc,
-            eth: holdings.eth * targets.eth,
-            ada: holdings.ada * targets.ada,
-        };
-
-        const currentBtcEqs = {
-            btc: holdings.btc,
+        const currentTotalValue = currentValues.btc + currentValues.eth + currentValues.ada;
+        const currentBtcEquivalents = {
+            btc: anchorBtc,
             eth: currentPrices.btc > 0 ? currentValues.eth / currentPrices.btc : 0,
             ada: currentPrices.btc > 0 ? currentValues.ada / currentPrices.btc : 0,
         };
-        const bullBtcEqs = {
-            btc: holdings.btc,
-            eth: targets.btc > 0 ? bullValues.eth / targets.btc : 0,
-            ada: targets.btc > 0 ? bullValues.ada / targets.btc : 0,
-        };
-
-        elements.btcCurrentValue.textContent = '$' + formatNumber(currentValues.btc);
-        elements.ethCurrentValue.textContent = '$' + formatNumber(currentValues.eth);
-        elements.ethCurrentBtcEq.textContent = currentBtcEqs.eth.toFixed(4) + ' BTC';
-        elements.adaCurrentValue.textContent = '$' + formatNumber(currentValues.ada);
-        elements.adaCurrentBtcEq.textContent = currentBtcEqs.ada.toFixed(4) + ' BTC';
-        
-        elements.btcBullValue.textContent = '$' + formatNumber(bullValues.btc);
-        elements.ethBullValue.textContent = '$' + formatNumber(bullValues.eth);
-        elements.adaBullValue.textContent = '$' + formatNumber(bullValues.ada);
-        
-        elements.btcBullBtcEq.textContent = bullBtcEqs.btc.toFixed(4) + ' BTC';
-        elements.ethBullBtcEq.textContent = bullBtcEqs.eth.toFixed(4) + ' BTC';
-        elements.adaBullBtcEq.textContent = bullBtcEqs.ada.toFixed(4) + ' BTC';
-        
-        const totalCurrentBtcEq = currentBtcEqs.btc + currentBtcEqs.eth + currentBtcEqs.ada;
-        const totalBullBtcEq = holdings.btc + bullBtcEqs.eth + bullBtcEqs.ada;
-        
-        const totalCurrentUsdValue = totalCurrentBtcEq * currentPrices.btc;
-        const totalBullUsdValue = totalBullBtcEq * targets.btc;
-        
-        elements.totalCurrentBtcEq.textContent = totalCurrentBtcEq.toFixed(4) + ' BTC';
-        elements.totalBullBtcEq.textContent = totalBullBtcEq.toFixed(4) + ' BTC';
-        elements.totalCurrentUsdValue.textContent = '$' + formatNumber(totalCurrentUsdValue);
-        elements.totalBullUsdValue.textContent = '$' + formatNumber(totalBullUsdValue);
-        
-        if (totalCurrentUsdValue > 0) {
-            elements.totalBullUsdValuePercent.textContent = `(+${formatNumber(((totalBullUsdValue / totalCurrentUsdValue) - 1) * 100)}%)`;
-        }
-        if (totalCurrentBtcEq > 0) {
-            elements.totalBullBtcEqPercent.textContent = `(+${formatNumber(((totalBullBtcEq / totalCurrentBtcEq) - 1) * 100)}%)`;
-        }
-        if (currentValues.btc > 0) {
-            elements.btcBullValuePercent.textContent = `(+${formatNumber(((bullValues.btc / currentValues.btc) - 1) * 100)}%)`;
-        }
-        if (currentValues.eth > 0) {
-            elements.ethBullValuePercent.textContent = `(+${formatNumber(((bullValues.eth / currentValues.eth) - 1) * 100)}%)`;
-        }
-        if (currentValues.ada > 0) {
-            elements.adaBullValuePercent.textContent = `(+${formatNumber(((bullValues.ada / currentValues.ada) - 1) * 100)}%)`;
-        }
-        if (currentBtcEqs.eth > 0) {
-            elements.ethBullBtcEqPercent.textContent = `(+${formatNumber(((bullBtcEqs.eth / currentBtcEqs.eth) - 1) * 100)}%)`;
-        }
-        if (currentBtcEqs.ada > 0) {
-            elements.adaBullBtcEqPercent.textContent = `(+${formatNumber(((bullBtcEqs.ada / currentBtcEqs.ada) - 1) * 100)}%)`;
-        }
-    }
-    
-    // --- Event Listeners & Simulation Logic ---
-    window.addEventListener('load', fetchPrices);
-    
-    const allInputs = [
-        elements.btcHoldings, elements.ethHoldings, elements.adaHoldings,
-        elements.btcCost, elements.ethCost, elements.adaCost,
-        elements.ethTargetPrice, elements.adaTargetPrice,
-        elements.monthlyDCA, elements.supercyclePercent, elements.cashReservePercent,
-        elements.c1BullTop, elements.c1BearBottom
-    ];
-
-    allInputs.forEach(input => {
-        input.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                elements.runSimulationBtn.click();
-            }
-        });
-        input.addEventListener('input', updateDashboard);
-    });
-    
-    elements.runSimulationBtn.addEventListener('click', () => {
-        elements.btnText.innerHTML = `<span class="loader loader-inline"></span><span>正在运行模拟...</span>`;
-        elements.runSimulationBtn.disabled = true;
-        runSimulation();
-        elements.btnText.innerHTML = `🚀 重新运行模拟`;
-        elements.runSimulationBtn.disabled = false;
-    });
-
-    function runSimulation() {
-        const initialState = {
-            btc: parseFloat(elements.btcHoldings.value) || 0,
-            eth: parseFloat(elements.ethHoldings.value) || 0,
-            ada: parseFloat(elements.adaHoldings.value) || 0,
-        };
-        const strategy = {
-            monthlyDCAEur: parseFloat(elements.monthlyDCA.value) || 0,
-            eurToUsdRate: 1.08,
-            supercycleRatio: (parseFloat(elements.supercyclePercent.value) || 0) / 100,
-            cashReserveRatio: (parseFloat(elements.cashReservePercent.value) || 0) / 100,
-        };
-        const cycle = {
-            bullTop: parseFloat(elements.c1BullTop.value) || 0,
-            bearBottom: parseFloat(elements.c1BearBottom.value) || 0,
-            ethTarget: parseFloat(elements.ethTargetPrice.value) || 0,
-            adaTarget: parseFloat(elements.adaTargetPrice.value) || 0,
+        const currentTotalBtcEq = currentBtcEquivalents.btc + currentBtcEquivalents.eth + currentBtcEquivalents.ada;
+        const currentPercentages = {
+            btc: currentTotalValue > 0 ? (currentValues.btc / currentTotalValue) * 100 : 0,
+            eth: currentTotalValue > 0 ? (currentValues.eth / currentTotalValue) * 100 : 0,
+            ada: currentTotalValue > 0 ? (currentValues.ada / currentTotalValue) * 100 : 0,
         };
         
-        let simulationLog = [];
-        let chartData = { fiat: [], btc: [] };
-        
-        const initialBtcEquivalent = btcEquivalentOf(initialState, currentPrices);
-        const initialFiatValue = initialBtcEquivalent * currentPrices.btc;
-        chartData.fiat.push(initialFiatValue);
-        chartData.btc.push(initialBtcEquivalent);
-        
-        const cycleResult = runSingleCycle(initialState, currentPrices, strategy, cycle, 3);
-        simulationLog.push(getCombinedSummary(cycleResult, initialBtcEquivalent, cycle));
-        elements.results.innerHTML = simulationLog.join('');
-        
-        chartData.fiat.push(cycleResult.fiatValueAtTop);
-        chartData.btc.push(cycleResult.btcEquivalentAtTop);
-        chartData.fiat.push(cycleResult.fiatValueAtBottom);
-        chartData.btc.push(cycleResult.btcEquivalentAtBottom);
-        renderChart(chartData);
-    }
-
-    // --- Core Logic Functions ---
-    function runSingleCycle(startPortfolio, prices, strategy, cycle, dcaMonths) {
-        let portfolio = JSON.parse(JSON.stringify(startPortfolio));
-        let gains = { dca: 0, alpha: 0, cycle: 0 };
-        const baseValues = {};
-
-        baseValues.initialBtc = btcEquivalentOf(portfolio, prices);
-        if (prices.btc > 0 && cycle.bullTop > 0) {
-            gains.dca = (strategy.monthlyDCAEur * strategy.eurToUsdRate * dcaMonths) / ((prices.btc + cycle.bullTop) / 2);
-        } else {
-            gains.dca = 0;
-        }
-        portfolio.btc += gains.dca;
-        baseValues.btcAfterDca = btcEquivalentOf(portfolio, prices);
-        
-        const dcaCompletedPortfolio = { btc: portfolio.btc, eth: startPortfolio.eth, ada: startPortfolio.ada };
-        const baseBtcEquivalentAtTop = btcEquivalentOf(dcaCompletedPortfolio, prices);
-        const topAltsValueInUsd = (startPortfolio.eth * cycle.ethTarget) + (startPortfolio.ada * cycle.adaTarget);
-        const topAltsInBtc = cycle.bullTop > 0 ? topAltsValueInUsd / cycle.bullTop : 0;
-        baseValues.totalBtcAtTop = portfolio.btc + topAltsInBtc;
-        gains.alpha = baseValues.totalBtcAtTop - baseBtcEquivalentAtTop;
-
-        const supercycleBtcToKeep = baseValues.totalBtcAtTop * strategy.supercycleRatio;
-        const btcToSell = baseValues.totalBtcAtTop - supercycleBtcToKeep;
-        const usdFromSale = btcToSell * cycle.bullTop;
-        
-        const usdToReserve = usdFromSale * strategy.cashReserveRatio;
-        const usdToSpend = usdFromSale - usdToReserve;
-
-        const btcBoughtBack = cycle.bearBottom > 0 ? usdToSpend / cycle.bearBottom : 0;
-        gains.cycle = btcBoughtBack - btcToSell;
-        const btcAtBottom = supercycleBtcToKeep + btcBoughtBack;
-        const finalPortfolio = { btc: btcAtBottom, usd: usdToReserve };
-        const btcEquivalentAtBottom = cycle.bearBottom > 0 ? btcAtBottom + (usdToReserve / cycle.bearBottom) : btcAtBottom;
-
-        
-        return {
-            gains, baseValues,
-            fiatValueAtTop: baseValues.totalBtcAtTop * cycle.bullTop,
-            btcEquivalentAtTop: baseValues.totalBtcAtTop,
-            portfolioAtTop: { btc: supercycleBtcToKeep, usd: usdFromSale },
-            fiatValueAtBottom: btcAtBottom * cycle.bearBottom + usdToReserve,
-            btcEquivalentAtBottom: btcEquivalentAtBottom,
-            portfolioAtBottom: finalPortfolio
-        };
-    }
-    
-    // --- Display Functions ---
-    function getCombinedSummary(result, initialBtc, cycle) {
-        const { gains, baseValues, portfolioAtTop, fiatValueAtTop, btcEquivalentAtTop, fiatValueAtBottom, btcEquivalentAtBottom, portfolioAtBottom } = result;
-        
-        const supercyclePercent = btcEquivalentAtTop > 0 ? (portfolioAtTop.btc / btcEquivalentAtTop) * 100 : 0;
-        const cyclePercent = 100 - supercyclePercent;
-
-        const initialFiat = initialBtc * currentPrices.btc;
-
-        const finalBtcPercent = btcEquivalentAtBottom > 0 ? (portfolioAtBottom.btc / btcEquivalentAtBottom) * 100 : 0;
-        const finalCashPercent = 100 - finalBtcPercent;
-
-        const holdings = {
-            btc: parseFloat(elements.btcHoldings.value) || 0,
-            eth: parseFloat(elements.ethHoldings.value) || 0,
-            ada: parseFloat(elements.adaHoldings.value) || 0
-        };
-        
-        // Initial state calculations
-        const initialFiatValues = {
-            btc: holdings.btc * currentPrices.btc,
-            eth: holdings.eth * currentPrices.eth,
-            ada: holdings.ada * currentPrices.ada
-        };
-        const initialPortfolioBtcEq = initialBtc > 0 ? holdings.btc : 0;
-        const initialPortfolioEthEq = initialBtc > 0 ? (holdings.eth * currentPrices.eth) / currentPrices.btc : 0;
-        const initialPortfolioAdaEq = initialBtc > 0 ? (holdings.ada * currentPrices.ada) / currentPrices.btc : 0;
-        
-        const btcInitialPercent = initialBtc > 0 ? (initialPortfolioBtcEq / initialBtc) * 100 : 0;
-        const ethInitialPercent = initialBtc > 0 ? (initialPortfolioEthEq / initialBtc) * 100 : 0;
-        const adaInitialPercent = initialBtc > 0 ? (initialPortfolioAdaEq / initialBtc) * 100 : 0;
-
-        // Bull top calculations
-        const bullTopValues = {
-            btc: (holdings.btc + gains.dca) * cycle.bullTop,
-            eth: holdings.eth * cycle.ethTarget,
-            ada: holdings.ada * cycle.adaTarget
-        };
-        const bullTopBtcPercent = fiatValueAtTop > 0 ? (bullTopValues.btc / fiatValueAtTop) * 100 : 0;
-        const bullTopEthPercent = fiatValueAtTop > 0 ? (bullTopValues.eth / fiatValueAtTop) * 100 : 0;
-        const bullTopAdaPercent = fiatValueAtTop > 0 ? (bullTopValues.ada / fiatValueAtTop) * 100 : 0;
-        
-        const bullTopBtcEq = {
-            btc: holdings.btc + gains.dca,
-            eth: cycle.bullTop > 0 ? bullTopValues.eth / cycle.bullTop : 0,
-            ada: cycle.bullTop > 0 ? bullTopValues.ada / cycle.bullTop : 0
-        };
-
-        return `
-        <div class="p-4 border-2 border-green-500 bg-gray-800 rounded-lg shadow-lg my-4">
-            <h3 class="font-bold text-lg text-green-400 mb-4 text-center">周期演算与关键节点快照</h3>
-            
-            <div class="space-y-4 text-sm">
-                <!-- Waterfall Calculation -->
-                <div class="p-3 bg-gray-900 rounded-md">
-                    <div class="flex justify-between items-center font-bold">
-                       <span>🏁 起始状态</span>
-                       <div class="text-right">
-                           <span>${initialBtc.toFixed(4)} BTC</span>
-                           <span class="text-sm text-green-400 ml-2">(100%)</span>
-                           <p class="text-xs text-gray-400 mt-1">($${formatNumber(initialFiat)})</p>
-                       </div>
-                    </div>
-                    <hr class="border-gray-700/50 my-2">
-                     <div class="w-full bg-gray-700 h-10 flex text-xs text-white rounded-md overflow-hidden">
-                        <div style="width: ${btcInitialPercent}%" class="bg-orange-500 flex flex-col justify-center overflow-visible p-1">
-                             <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${btcInitialPercent.toFixed(0)}% BTC</span>
-                                <span class="font-semibold text-xs block">${initialPortfolioBtcEq.toFixed(2)} BTC / $${formatNumber(initialFiatValues.btc, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${ethInitialPercent}%" class="bg-indigo-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${ethInitialPercent.toFixed(0)}% ETH</span>
-                                <span class="font-semibold text-xs block">${initialPortfolioEthEq.toFixed(2)} BTC / $${formatNumber(initialFiatValues.eth, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${adaInitialPercent}%" class="bg-sky-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${adaInitialPercent.toFixed(0)}% ADA</span>
-                                <span class="font-semibold text-xs block">${initialPortfolioAdaEq.toFixed(2)} BTC / $${formatNumber(initialFiatValues.ada, 0)}</span>
-                            </div>
-                        </div>
-                    </div>
+        const startPointHTML = `
+            <div class="phase-card">
+                <h3 class="font-bold text-lg text-blue-400 mb-2">1. 起点 (当前持仓)</h3>
+                 <p class="text-xs text-gray-400 mb-1 mt-2">当前总价值: <strong class="text-white">$${formatNum(currentTotalValue, 0)}</strong> (${formatNum(currentTotalBtcEq, 4)} BTC)</p>
+                 <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
+                    <div style="width: ${currentPercentages.btc}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.btc, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.btc, 4)} BTC\n占比: ${currentPercentages.btc.toFixed(1)}%">⚓ BTC: ${currentPercentages.btc.toFixed(0)}%</div>
+                    <div style="width: ${currentPercentages.eth}%" class="bg-purple-600 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.eth, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.eth, 4)} BTC\n占比: ${currentPercentages.eth.toFixed(1)}%">⛵ ETH: ${currentPercentages.eth.toFixed(0)}%</div>
+                    <div style="width: ${currentPercentages.ada}%" class="bg-sky-500 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.ada, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.ada, 4)} BTC\n占比: ${currentPercentages.ada.toFixed(1)}%">⛵ ADA: ${currentPercentages.ada.toFixed(0)}%</div>
                 </div>
+            </div>`;
 
-                <div class="pl-4 border-l-2 border-purple-500">
-                    <div class="flex justify-between items-center">
-                        <span>× 风险引擎 (山寨币轮动)</span>
-                        <span class="font-semibold text-purple-400">×${(baseValues.btcAfterDca > 0 ? baseValues.totalBtcAtTop / baseValues.btcAfterDca : 0).toFixed(2)}</span>
-                    </div>
+        // --- 3. 收获期 (牛市顶部) ---
+        const anchorValueBull = anchorBtc * bullBtcPrice;
+        const sailEthValueBull = sailEth * bullEthPrice;
+        const sailAdaValueBull = sailAda * bullAdaPrice;
+        const totalValueBull = anchorValueBull + sailEthValueBull + sailAdaValueBull;
+        const harvestedUsdt = sailEthValueBull + sailAdaValueBull;
+        const anchorPctBull = totalValueBull > 0 ? (anchorValueBull / totalValueBull) * 100 : 0;
+        const sailEthPctBull = totalValueBull > 0 ? (sailEthValueBull / totalValueBull) * 100 : 0;
+        const sailAdaPctBull = totalValueBull > 0 ? (sailAdaValueBull / totalValueBull) * 100 : 0;
+        const anchorBtcEqBull = anchorBtc;
+        const sailEthBtcEqBull = bullBtcPrice > 0 ? sailEthValueBull / bullBtcPrice : 0;
+        const sailAdaBtcEqBull = bullBtcPrice > 0 ? sailAdaValueBull / bullBtcPrice : 0;
+
+        // --- 4. 重新播种 (下一轮熊市底部) ---
+        const newBtcFromSail = bearBtcPrice2 > 0 ? harvestedUsdt / bearBtcPrice2 : 0;
+        const finalTotalBtc = anchorBtc + newBtcFromSail;
+        const anchorFinalPct = finalTotalBtc > 0 ? (anchorBtc / finalTotalBtc * 100) : 0;
+        const newSailFinalPct = finalTotalBtc > 0 ? (newBtcFromSail / finalTotalBtc * 100) : 0;
+        
+        // --- 5. 渲染结果 ---
+        elements.results.innerHTML = `
+            ${startPointHTML}
+            <div class="text-center text-gray-500 text-2xl">↓</div>
+
+            <div class="phase-card border-l-red-500">
+                <h3 class="font-bold text-lg text-red-400 mb-2">2. 收获期 (牛市顶部)</h3>
+                <p class="text-xs text-gray-400 mb-1 mt-2">牛顶总价值: <strong class="text-white">$${formatNum(totalValueBull, 0)}</strong> (${formatNum(anchorBtc + sailEthBtcEqBull + sailAdaBtcEqBull, 4)} BTC)</p>
+                <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
+                    <div style="width: ${anchorPctBull}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(anchorValueBull, 0)}\nBTC 等量: ${formatNum(anchorBtcEqBull, 4)} BTC\n占比: ${anchorPctBull.toFixed(1)}%">⚓ 锚 (BTC): ${formatNum(anchorPctBull, 0)}%</div>
+                    <div style="width: ${sailEthPctBull}%" class="bg-purple-600 flex items-center justify-center" title="法币价值: $${formatNum(sailEthValueBull, 0)}\nBTC 等量: ${formatNum(sailEthBtcEqBull, 4)} BTC\n占比: ${sailEthPctBull.toFixed(1)}%">⛵ 帆 (ETH): ${formatNum(sailEthPctBull, 0)}%</div>
+                    <div style="width: ${sailAdaPctBull}%" class="bg-sky-500 flex items-center justify-center" title="法币价值: $${formatNum(sailAdaValueBull, 0)}\nBTC 等量: ${formatNum(sailAdaBtcEqBull, 4)} BTC\n占比: ${sailAdaPctBull.toFixed(1)}%">⛵ 帆 (ADA): ${formatNum(sailAdaPctBull, 0)}%</div>
                 </div>
+                <p class="mt-2 text-sm">➡️ 严格执行纪律: <strong class="text-amber-400">“锚”仓位不动</strong>, <strong class="text-amber-400">“帆”仓位(ETH/ADA)全部卖出</strong></p>
+                <p class="font-semibold text-yellow-300">💰 收获弹药: ${formatNum(harvestedUsdt, 0)} USDT</p>
+            </div>
 
-                <!-- Bull Top Snapshot -->
-                <div class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
-                    <div class="flex justify-between items-center font-bold">
-                       <span>= 📈 牛顶总额 (收获期)</span>
-                       <div class="text-right">
-                           <span class="text-lg text-red-300">${btcEquivalentAtTop.toFixed(4)} BTC</span>
-                           <span class="text-sm text-green-400 ml-2">(+${(initialBtc > 0 ? ((btcEquivalentAtTop/initialBtc)-1)*100 : 0).toFixed(2)}%)</span>
-                           <p class="text-xs text-gray-400 mt-1">($${formatNumber(fiatValueAtTop)})</p>
-                       </div>
-                    </div>
-                    <hr class="border-red-500/30 my-2">
-                    <p class="text-xs text-gray-400 mb-1">牛顶资产构成:</p>
-                    <div class="w-full bg-gray-700 h-10 flex text-xs text-white mb-3 rounded-md overflow-hidden">
-                        <div style="width: ${bullTopBtcPercent}%" class="bg-orange-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${bullTopBtcPercent.toFixed(0)}% BTC</span>
-                                <span class="font-semibold text-xs block">${bullTopBtcEq.btc.toFixed(2)} BTC / $${formatNumber(bullTopValues.btc, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${bullTopEthPercent}%" class="bg-indigo-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${bullTopEthPercent.toFixed(0)}% ETH</span>
-                                <span class="font-semibold text-xs block">${bullTopBtcEq.eth.toFixed(2)} BTC / $${formatNumber(bullTopValues.eth, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${bullTopAdaPercent}%" class="bg-sky-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">${bullTopAdaPercent.toFixed(0)}% ADA</span>
-                                <span class="font-semibold text-xs block">${bullTopBtcEq.ada.toFixed(2)} BTC / $${formatNumber(bullTopValues.ada, 0)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-400 mb-1">牛顶卖出策略:</p>
-                    <div class="w-full bg-gray-700 h-10 flex text-xs text-white rounded-md overflow-hidden">
-                        <div style="width: ${supercyclePercent}%" class="bg-orange-500 flex flex-col justify-center overflow-visible p-1">
-                             <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">SC 仓位 (BTC) ${supercyclePercent.toFixed(0)}%</span>
-                                <span class="font-semibold text-xs block">${portfolioAtTop.btc.toFixed(2)} BTC / $${formatNumber(portfolioAtTop.btc * cycle.bullTop, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${cyclePercent}%" class="bg-green-500 flex flex-col justify-center overflow-visible p-1">
-                             <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">USDT ${cyclePercent.toFixed(0)}%</span>
-                                <span class="font-semibold text-xs block">${(cycle.bullTop > 0 ? portfolioAtTop.usd / cycle.bullTop : 0).toFixed(2)} BTC / $${formatNumber(portfolioAtTop.usd, 0)}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="text-center text-gray-500 text-2xl">↓</div>
 
-                <div class="pl-4 border-l-2 border-red-500">
-                     <div class="flex justify-between items-center">
-                        <span>× 周期引擎 (高抛低吸)</span>
-                        <span class="font-semibold text-red-400">×${(btcEquivalentAtTop > 0 ? btcEquivalentAtBottom / btcEquivalentAtTop : 0).toFixed(2)}</span>
-                    </div>
-                </div>
-
-                <!-- Bear Bottom Snapshot -->
-                <div class="p-3 bg-blue-900/20 border border-blue-500/50 rounded-lg">
-                    <div class="flex justify-between items-center font-bold">
-                       <span>= 📉 熊底总量 (播种期)</span>
-                       <div class="text-right">
-                           <span class="text-lg text-blue-300">${btcEquivalentAtBottom.toFixed(4)} BTC</span>
-                           <span class="text-sm text-green-400 ml-2">(+${(initialBtc > 0 ? ((btcEquivalentAtBottom/initialBtc)-1)*100 : 0).toFixed(2)}%)</span>
-                       </div>
-                    </div>
-                    <div class="text-right text-xs text-gray-400 mt-1">
-                        ($${formatNumber(fiatValueAtBottom)})
-                    </div>
-                     <hr class="border-blue-500/30 my-2">
-                     <div class="w-full bg-gray-700 h-10 flex text-xs text-white rounded-md overflow-hidden">
-                        <div style="width: ${finalBtcPercent}%" class="bg-orange-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">BTC ${finalBtcPercent.toFixed(0)}%</span>
-                                <span class="font-semibold text-xs block">${portfolioAtBottom.btc.toFixed(2)} BTC / $${formatNumber(portfolioAtBottom.btc * cycle.bearBottom, 0)}</span>
-                            </div>
-                        </div>
-                        <div style="width: ${finalCashPercent}%" class="bg-green-500 flex flex-col justify-center overflow-visible p-1">
-                            <div class="text-center leading-tight whitespace-nowrap px-1">
-                                <span class="font-bold">USDT ${finalCashPercent.toFixed(0)}%</span>
-                                <span class="font-semibold text-xs block">${(cycle.bearBottom > 0 ? portfolioAtBottom.usd / cycle.bearBottom : 0).toFixed(2)} BTC / $${formatNumber(portfolioAtBottom.usd, 0)}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pl-4 border-l-2 border-blue-500">
-                    <div class="flex justify-between items-center">
-                        <span>+ 定投引擎 (牛市冲顶期)</span>
-                        <span class="font-semibold text-blue-400">+${gains.dca.toFixed(4)} BTC</span>
-                    </div>
-                </div>
-
-                 <div class="p-3 bg-gray-900 rounded-md mt-2 border-t-2 border-yellow-400">
-                   <div class="flex justify-between items-center font-bold">
-                       <span>= 🏆 最终BTC总量 (下一周期起点)</span>
-                       <div class="text-right">
-                            <span class="text-lg text-yellow-300">${(btcEquivalentAtBottom + gains.dca).toFixed(4)} BTC</span>
-                            <span class="text-sm text-green-400 ml-2">(+${(initialBtc > 0 ? (((btcEquivalentAtBottom + gains.dca)/initialBtc)-1)*100 : 0).toFixed(2)}%)</span>
-                       </div>
+            <div class="phase-card border-l-yellow-500">
+                <h3 class="font-bold text-lg text-yellow-400 mb-2">3. 重新播种 (下一轮熊底)</h3>
+                <p class="text-sm">➡️ 将全部 ${formatNum(harvestedUsdt, 0)} USDT 弹药, 在 BTC=$${formatNum(bearBtcPrice2, 0)} 时买入BTC</p>
+                <p class="font-semibold text-green-300">⛵ “帆”带回: ${formatNum(newBtcFromSail, 4)} BTC</p>
+                <div class="mt-3">
+                     <p class="text-xs text-gray-400 mb-1 mt-2">熊底总仓位构成 (总价值: <strong class="text-white">$${formatNum(finalTotalBtc * bearBtcPrice2, 0)}</strong> | 总BTC量: <strong class="text-white">${formatNum(finalTotalBtc, 4)} BTC</strong>)</p>
+                    <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
+                        <div style="width: ${anchorFinalPct}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(anchorBtc * bearBtcPrice2, 0)}\nBTC 数量: ${formatNum(anchorBtc, 4)} BTC\n占比: ${anchorFinalPct.toFixed(1)}%">⚓ 锚: ${anchorFinalPct.toFixed(0)}%</div>
+                        <div style="width: ${newSailFinalPct}%" class="bg-green-500 flex items-center justify-center" title="法币价值: $${formatNum(newBtcFromSail * bearBtcPrice2, 0)}\nBTC 数量: ${formatNum(newBtcFromSail, 4)} BTC\n占比: ${newSailFinalPct.toFixed(1)}%">⛵ 帆(新): ${newSailFinalPct.toFixed(0)}%</div>
                    </div>
                 </div>
             </div>
-        </div>`;
+            
+            <hr class="border-gray-600 my-4">
+
+            <div class="summary-card p-4 rounded-lg">
+                <h3 class="font-bold text-xl text-amber-400 mb-3 text-center">🏆 本周期总结与下一轮起点 🏆</h3>
+                <div class="space-y-3 text-center">
+                    <p><strong>本周期“锚”仓位 (未动):</strong> ${formatNum(anchorBtc, 4)} BTC</p>
+                    <p><strong>本周期“帆”带回仓位:</strong> ${formatNum(newBtcFromSail, 4)} BTC</p>
+                    <p class="text-2xl font-bold text-white"><strong>下一周期起点总资产: ${formatNum(finalTotalBtc, 4)} BTC</strong></p>
+                    <p class="pt-3 text-sm">下一轮远航，您可以将这 ${formatNum(finalTotalBtc, 4)} BTC 作为起点, 再次按 50/50 分配给新的“锚”与“帆”。</p>
+                </div>
+            </div>
+        `;
+
+        const initialSailBtcEq = currentBtcEquivalents.eth + currentBtcEquivalents.ada;
+        renderChart({
+            anchor: anchorBtc,
+            initialSail: initialSailBtcEq,
+            newSail: newBtcFromSail
+        });
     }
 
     function renderChart(data) {
         if (growthChart) {
             growthChart.destroy();
         }
-        const chartCtx = elements.chartCtx;
-        growthChart = new Chart(chartCtx, {
-            type: 'line',
+        growthChart = new Chart(elements.chartCtx, {
+            type: 'bar',
             data: {
-                labels: ['初始', '周期牛顶', '最终 (周期熊底)'],
-                datasets: [{
-                    label: '总资产 (USD)',
-                    data: data.fiat,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    yAxisID: 'yFiat',
-                    tension: 0.1,
-                    fill: true
-                }, {
-                    label: 'BTC 总量',
-                    data: data.btc,
-                    borderColor: '#f97116',
-                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                    yAxisID: 'yBtc',
-                    tension: 0.1,
-                }]
+                labels: ['周期起点总BTC', '下一周期总BTC'],
+                datasets: [
+                    {
+                        label: '锚 ⚓ (核心仓位)',
+                        data: [data.anchor, data.anchor],
+                        backgroundColor: '#ea580c',
+                        borderColor: '#c2410c',
+                        borderWidth: 1,
+                        stack: 'Stack 0',
+                    },
+                     {
+                        label: '帆 ⛵ (周期变化)',
+                        data: [data.initialSail, data.newSail],
+                        backgroundColor: '#16a34a',
+                        borderColor: '#15803d',
+                        borderWidth: 1,
+                        stack: 'Stack 0',
+                    }
+                ]
             },
             options: {
                 responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    yFiat: {
-                        type: 'logarithmic',
-                        position: 'left',
-                        ticks: { color: '#d1d5db',
-                            callback: function(value) {
-                                if (value >= 1000000) return (value / 1000000) + 'M';
-                                if (value >= 1000) return (value / 1000) + 'K';
-                                return value;
-                            }
-                        },
-                        grid: { color: '#374151' }
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#d1d5db' }
                     },
-                    yBtc: {
-                        type: 'linear',
-                        position: 'right',
-                        ticks: { color: '#d1d5db' },
-                        grid: { drawOnChartArea: false }
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += formatNum(context.parsed.y, 4) + ' BTC';
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
-                plugins: { legend: { labels: { color: '#d1d5db' } } }
+                scales: {
+                    x: {
+                        ticks: { color: '#d1d5db' },
+                        grid: { color: '#374151' }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: { color: '#d1d5db' },
+                        grid: { color: '#374151' },
+                        title: {
+                            display: true,
+                            text: 'BTC 数量',
+                            color: '#d1d5db'
+                        }
+                    }
+                }
             }
         });
     }
-</script>
 
+    function setBearBottomDefault() {
+        elements.bearBtcPrice2.value = elements.previousBullBtcPrice.value;
+    }
+    
+    elements.previousBullBtcPrice.addEventListener('input', setBearBottomDefault);
+    elements.runBtn.addEventListener('click', runSimulation);
+    window.addEventListener('load', fetchPricesAndRun);
+
+</script>
 </body>
 </html>
 
