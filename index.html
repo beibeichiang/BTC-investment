@@ -82,7 +82,7 @@
                             <input type="number" id="currentEth" value="6.8145" class="w-full mt-1 p-2 rounded-md">
                             
                             <label for="currentAda" class="block text-xs mt-2">ADA (帆 ⛵)</label>
-                            <input type="number" id="currentAda" value="23352.7045" class="w-full mt-1 p-2 rounded-md">
+                            <input type="number" id="currentAda" value="24034.3" class="w-full mt-1 p-2 rounded-md">
                         </div>
 
                         <div class="input-group">
@@ -212,9 +212,17 @@
                 <h3 class="font-bold text-lg text-blue-400 mb-2">1. 起点 (当前持仓)</h3>
                  <p class="text-xs text-gray-400 mb-1 mt-2">当前总价值: <strong class="text-white">$${formatNum(currentTotalValue, 0)}</strong> (${formatNum(currentTotalBtcEq, 4)} BTC)</p>
                  <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
-                    <div style="width: ${currentPercentages.btc}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.btc, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.btc, 4)} BTC\n占比: ${currentPercentages.btc.toFixed(1)}%">⚓ BTC: ${currentPercentages.btc.toFixed(0)}%</div>
-                    <div style="width: ${currentPercentages.eth}%" class="bg-purple-600 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.eth, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.eth, 4)} BTC\n占比: ${currentPercentages.eth.toFixed(1)}%">⛵ ETH: ${currentPercentages.eth.toFixed(0)}%</div>
-                    <div style="width: ${currentPercentages.ada}%" class="bg-sky-500 flex items-center justify-center" title="法币价值: $${formatNum(currentValues.ada, 0)}\nBTC 等量: ${formatNum(currentBtcEquivalents.ada, 4)} BTC\n占比: ${currentPercentages.ada.toFixed(1)}%">⛵ ADA: ${currentPercentages.ada.toFixed(0)}%</div>
+                    <div style="width: ${currentPercentages.btc}%" class="bg-orange-500 flex items-center justify-center">⚓ BTC: ${currentPercentages.btc.toFixed(0)}%</div>
+                    <div style="width: ${currentPercentages.eth}%" class="bg-purple-600 flex items-center justify-center">⛵ ETH: ${currentPercentages.eth.toFixed(0)}%</div>
+                    <div style="width: ${currentPercentages.ada}%" class="bg-sky-500 flex items-center justify-center">⛵ ADA: ${currentPercentages.ada.toFixed(0)}%</div>
+                </div>
+                <div class="mt-3 space-y-2 text-xs border-t border-gray-700 pt-3">
+                    <div class="grid grid-cols-4 gap-2 text-gray-400 font-semibold">
+                        <div>资产</div><div class="text-right">占比</div><div class="text-right">数量/BTC等量</div><div class="text-right">法币价值</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⚓ BTC</div><div class="text-right">${currentPercentages.btc.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(anchorBtc, 4)} BTC</div><div class="text-right font-mono">$${formatNum(currentValues.btc, 0)}</div></div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⛵ ETH</div><div class="text-right">${currentPercentages.eth.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(currentBtcEquivalents.eth, 4)} BTC</div><div class="text-right font-mono">$${formatNum(currentValues.eth, 0)}</div></div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⛵ ADA</div><div class="text-right">${currentPercentages.ada.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(currentBtcEquivalents.ada, 4)} BTC</div><div class="text-right font-mono">$${formatNum(currentValues.ada, 0)}</div></div>
                 </div>
             </div>`;
 
@@ -246,11 +254,19 @@
                 <h3 class="font-bold text-lg text-red-400 mb-2">2. 收获期 (牛市顶部)</h3>
                 <p class="text-xs text-gray-400 mb-1 mt-2">牛顶总价值: <strong class="text-white">$${formatNum(totalValueBull, 0)}</strong> (${formatNum(anchorBtc + sailEthBtcEqBull + sailAdaBtcEqBull, 4)} BTC)</p>
                 <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
-                    <div style="width: ${anchorPctBull}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(anchorValueBull, 0)}\nBTC 等量: ${formatNum(anchorBtcEqBull, 4)} BTC\n占比: ${anchorPctBull.toFixed(1)}%">⚓ 锚 (BTC): ${formatNum(anchorPctBull, 0)}%</div>
-                    <div style="width: ${sailEthPctBull}%" class="bg-purple-600 flex items-center justify-center" title="法币价值: $${formatNum(sailEthValueBull, 0)}\nBTC 等量: ${formatNum(sailEthBtcEqBull, 4)} BTC\n占比: ${sailEthPctBull.toFixed(1)}%">⛵ 帆 (ETH): ${formatNum(sailEthPctBull, 0)}%</div>
-                    <div style="width: ${sailAdaPctBull}%" class="bg-sky-500 flex items-center justify-center" title="法币价值: $${formatNum(sailAdaValueBull, 0)}\nBTC 等量: ${formatNum(sailAdaBtcEqBull, 4)} BTC\n占比: ${sailAdaPctBull.toFixed(1)}%">⛵ 帆 (ADA): ${formatNum(sailAdaPctBull, 0)}%</div>
+                    <div style="width: ${anchorPctBull}%" class="bg-orange-500 flex items-center justify-center">⚓ 锚 (BTC): ${formatNum(anchorPctBull, 0)}%</div>
+                    <div style="width: ${sailEthPctBull}%" class="bg-purple-600 flex items-center justify-center">⛵ 帆 (ETH): ${formatNum(sailEthPctBull, 0)}%</div>
+                    <div style="width: ${sailAdaPctBull}%" class="bg-sky-500 flex items-center justify-center">⛵ 帆 (ADA): ${formatNum(sailAdaPctBull, 0)}%</div>
                 </div>
-                <p class="mt-2 text-sm">➡️ 严格执行纪律: <strong class="text-amber-400">“锚”仓位不动</strong>, <strong class="text-amber-400">“帆”仓位(ETH/ADA)全部卖出</strong></p>
+                 <div class="mt-3 space-y-2 text-xs border-t border-gray-700 pt-3">
+                    <div class="grid grid-cols-4 gap-2 text-gray-400 font-semibold">
+                        <div>资产</div><div class="text-right">占比</div><div class="text-right">BTC等量</div><div class="text-right">法币价值</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⚓ 锚(BTC)</div><div class="text-right">${anchorPctBull.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(anchorBtcEqBull, 4)} BTC</div><div class="text-right font-mono">$${formatNum(anchorValueBull, 0)}</div></div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⛵ 帆(ETH)</div><div class="text-right">${sailEthPctBull.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(sailEthBtcEqBull, 4)} BTC</div><div class="text-right font-mono">$${formatNum(sailEthValueBull, 0)}</div></div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⛵ 帆(ADA)</div><div class="text-right">${sailAdaPctBull.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(sailAdaBtcEqBull, 4)} BTC</div><div class="text-right font-mono">$${formatNum(sailAdaValueBull, 0)}</div></div>
+                </div>
+                <p class="mt-4 text-sm">➡️ 严格执行纪律: <strong class="text-amber-400">“锚”仓位不动</strong>, <strong class="text-amber-400">“帆”仓位(ETH/ADA)全部卖出</strong></p>
                 <p class="font-semibold text-yellow-300">💰 收获弹药: ${formatNum(harvestedUsdt, 0)} USDT</p>
             </div>
 
@@ -261,10 +277,17 @@
                 <p class="text-sm">➡️ 将全部 ${formatNum(harvestedUsdt, 0)} USDT 弹药, 在 BTC=$${formatNum(bearBtcPrice2, 0)} 时买入BTC</p>
                 <p class="font-semibold text-green-300">⛵ “帆”带回: ${formatNum(newBtcFromSail, 4)} BTC</p>
                 <div class="mt-3">
-                     <p class="text-xs text-gray-400 mb-1 mt-2">熊底总仓位构成 (总价值: <strong class="text-white">$${formatNum(finalTotalBtc * bearBtcPrice2, 0)}</strong> | 总BTC量: <strong class="text-white">${formatNum(finalTotalBtc, 4)} BTC</strong>)</p>
+                    <p class="text-xs text-gray-400 mb-1 mt-2">熊底总仓位构成 (总价值: <strong class="text-white">$${formatNum(finalTotalBtc * bearBtcPrice2, 0)}</strong> | 总BTC量: <strong class="text-white">${formatNum(finalTotalBtc, 4)} BTC</strong>)</p>
                     <div class="w-full bg-gray-900 h-8 flex text-xs text-white rounded-md overflow-hidden mt-1">
-                        <div style="width: ${anchorFinalPct}%" class="bg-orange-500 flex items-center justify-center" title="法币价值: $${formatNum(anchorBtc * bearBtcPrice2, 0)}\nBTC 数量: ${formatNum(anchorBtc, 4)} BTC\n占比: ${anchorFinalPct.toFixed(1)}%">⚓ 锚: ${anchorFinalPct.toFixed(0)}%</div>
-                        <div style="width: ${newSailFinalPct}%" class="bg-green-500 flex items-center justify-center" title="法币价值: $${formatNum(newBtcFromSail * bearBtcPrice2, 0)}\nBTC 数量: ${formatNum(newBtcFromSail, 4)} BTC\n占比: ${newSailFinalPct.toFixed(1)}%">⛵ 帆(新): ${newSailFinalPct.toFixed(0)}%</div>
+                        <div style="width: ${anchorFinalPct}%" class="bg-orange-500 flex items-center justify-center">⚓ 锚: ${anchorFinalPct.toFixed(0)}%</div>
+                        <div style="width: ${newSailFinalPct}%" class="bg-green-500 flex items-center justify-center">⛵ 帆(新): ${newSailFinalPct.toFixed(0)}%</div>
+                   </div>
+                   <div class="mt-3 space-y-2 text-xs border-t border-gray-700 pt-3">
+                    <div class="grid grid-cols-4 gap-2 text-gray-400 font-semibold">
+                        <div>资产构成</div><div class="text-right">占比</div><div class="text-right">BTC数量</div><div class="text-right">法币价值</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⚓ 锚(原始)</div><div class="text-right">${anchorFinalPct.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(anchorBtc, 4)} BTC</div><div class="text-right font-mono">$${formatNum(anchorBtc * bearBtcPrice2, 0)}</div></div>
+                    <div class="grid grid-cols-4 gap-2 items-center"><div class="font-semibold">⛵ 帆(新获)</div><div class="text-right">${newSailFinalPct.toFixed(1)}%</div><div class="text-right font-mono">${formatNum(newBtcFromSail, 4)} BTC</div><div class="text-right font-mono">$${formatNum(newBtcFromSail * bearBtcPrice2, 0)}</div></div>
                    </div>
                 </div>
             </div>
