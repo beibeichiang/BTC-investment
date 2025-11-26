@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>锚与帆 | 战略指挥舱 v3.3 (Light)</title>
+    <title>锚与帆 | 深度实战推演 v5.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <script>
@@ -22,326 +20,343 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        btc: '#F59E0B', // 琥珀色/橙色
-                        eth: '#8B5CF6', // 经典紫色
-                        ada: '#2563EB', // 鲜亮的蓝色
-                        usdt: '#10B981', // 翠绿色
-                        bg: '#F3F4F6', // 浅灰背景
-                        card: '#FFFFFF', // 纯白卡片
-                        border: '#E5E7EB', // 边框灰
-                        textMain: '#111827', // 深黑文字
-                        textMuted: '#6B7280' // 次要文字
+                        btc: '#F7931A',
+                        eth: '#8B5CF6', // ETH 紫色
+                        ada: '#2563EB', // ADA 蓝色
+                        usdt: '#10B981',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
         }
     </script>
     <style>
-        body {
-            background-color: #F3F4F6;
-            color: #1F2937;
+        body { background-color: #F3F4F6; color: #111827; font-family: 'Inter', sans-serif; }
+        .panel { background: #FFF; border: 1px solid #E5E7EB; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .input-field { background: transparent; outline: none; width: 100%; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .input-group { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0.5rem; transition: all 0.2s; }
+        .input-group:focus-within { background: #FFF; border-color: #9CA3AF; box-shadow: 0 0 0 3px rgba(229, 231, 235, 0.5); }
+        .num-font { font-family: 'JetBrains Mono', monospace; }
+        
+        /* 虚线连接效果 */
+        .connector-line {
+            border-left: 2px dashed #D1D5DB;
+            margin-left: 1.5rem;
+            height: 2rem;
         }
-        /* 卡片样式：纯白底 + 柔和阴影 */
-        .panel {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            transition: box-shadow 0.2s;
-        }
-        .panel:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .input-group {
-            background-color: #F9FAFB; /* 极浅灰输入框背景 */
-            border: 1px solid #D1D5DB;
-            transition: all 0.2s;
-        }
-        .input-group:focus-within {
-            border-color: #6B7280;
-            background-color: #FFFFFF;
-            box-shadow: 0 0 0 2px rgba(229, 231, 235, 0.5);
-        }
-        .input-field {
+        
+        /* 比例柱动画 */
+        .bar-segment { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* 滑块样式 */
+        input[type=range] {
+            -webkit-appearance: none; 
+            width: 100%; 
             background: transparent;
-            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #4B5563;
+            cursor: pointer;
+            margin-top: -6px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            color: #111827;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
+            height: 4px;
+            cursor: pointer;
+            background: #E5E7EB;
+            border-radius: 2px;
         }
-        /* 进度条动画 */
-        .progress-segment {
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        /* 滚动条 */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #F3F4F6; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 text-base">
+<body class="min-h-screen p-6 md:p-10 text-sm">
 
     <div class="max-w-[1600px] mx-auto space-y-8">
         
         <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center gap-4 pb-4 border-b border-gray-200">
+        <header class="flex flex-col md:flex-row justify-between items-center gap-6 pb-6 border-b border-gray-200">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-btc shadow-sm">
-                    <i class="ph-fill ph-anchor text-3xl"></i>
+                <div class="w-12 h-12 bg-white border border-gray-200 rounded-2xl flex items-center justify-center text-btc shadow-soft">
+                    <i class="ph-fill ph-strategy text-3xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 tracking-tight">锚与帆 <span class="text-gray-400 font-normal text-lg ml-1">v3.3</span></h1>
-                    <p class="text-gray-500 text-sm font-medium">周期套利战略模拟 (Day Mode)</p>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">锚与帆 <span class="text-gray-400 font-normal text-sm ml-2 bg-gray-100 px-2 py-0.5 rounded-full">v5.3 Strategy Shift</span></h1>
+                    <p class="text-gray-500 text-xs font-medium mt-0.5">Cycle 1 激进进攻 ➔ Cycle 2+ 稳健复利</p>
                 </div>
             </div>
             
-            <!-- 顶部数据条 -->
-            <div class="flex items-center gap-4 bg-white px-5 py-3 rounded-xl border border-gray-200 shadow-sm">
-                <div class="flex items-center gap-4 text-sm font-mono">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-btc"></span>
-                        <span class="text-gray-500 font-bold">BTC</span>
-                        <span class="text-gray-900 font-bold" id="price-btc">$--</span>
-                    </div>
-                    <div class="w-px h-4 bg-gray-300"></div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-eth"></span>
-                        <span class="text-gray-500 font-bold">ETH</span>
-                        <span class="text-gray-900 font-bold" id="price-eth">$--</span>
-                    </div>
-                    <div class="w-px h-4 bg-gray-300"></div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-ada"></span>
-                        <span class="text-gray-500 font-bold">ADA</span>
-                        <span class="text-gray-900 font-bold" id="price-ada">$--</span>
-                    </div>
+            <div class="flex items-center gap-6 bg-white px-6 py-3 rounded-2xl border border-gray-200 shadow-soft">
+                <div class="flex items-center gap-5 text-xs num-font font-bold text-gray-600">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-btc"></span> BTC <span id="price-btc" class="text-gray-900">$--</span></span>
+                    <span class="text-gray-300">|</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-eth"></span> ETH <span id="price-eth" class="text-gray-900">$--</span></span>
+                    <span class="text-gray-300">|</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-ada"></span> ADA <span id="price-ada" class="text-gray-900">$--</span></span>
                 </div>
-                
-                <div class="w-px h-8 bg-gray-200 mx-2"></div>
-
+                <div class="w-px h-6 bg-gray-200"></div>
                 <div class="flex flex-col items-end leading-none">
-                    <span class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Ahr999 Index</span>
-                    <span class="text-lg font-mono font-bold text-gray-800" id="ahr-value">--</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-bold">Ahr999 Index</span>
+                    <span class="text-base num-font font-bold text-gray-800" id="ahr-value">--</span>
                 </div>
-                
-                <button id="refresh-btn" class="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
-                    <i class="ph-bold ph-arrows-clockwise text-xl"></i>
+                <button id="refresh-btn" class="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors">
+                    <i class="ph-bold ph-arrows-clockwise text-lg"></i>
                 </button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
             
-            <!-- 左侧：参数设置 (3列) -->
+            <!-- 左侧：控制台 (3列) -->
             <div class="xl:col-span-3 space-y-6">
                 
-                <!-- 1. 持仓输入 -->
-                <div class="panel rounded-xl p-5">
-                    <h2 class="text-gray-800 font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
-                        <div class="p-1.5 bg-blue-50 text-blue-600 rounded-md"><i class="ph-bold ph-wallet"></i></div>
-                        1. 当前持仓 (起点)
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="input-group rounded-lg p-3 flex justify-between items-center border-l-4 border-l-btc">
-                            <label class="text-sm text-gray-600 font-bold">⚓ BTC</label>
-                            <input type="number" id="currentBtc" class="input-field text-right text-lg" placeholder="0.00">
-                        </div>
-                        <div class="input-group rounded-lg p-3 flex justify-between items-center border-l-4 border-l-eth">
-                            <label class="text-sm text-gray-600 font-bold">⛵ ETH</label>
-                            <input type="number" id="currentEth" class="input-field text-right text-lg">
-                        </div>
-                        <div class="input-group rounded-lg p-3 flex justify-between items-center border-l-4 border-l-ada">
-                            <label class="text-sm text-gray-600 font-bold">⛵ ADA</label>
-                            <input type="number" id="currentAda" class="input-field text-right text-lg">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. 牛顶目标 -->
-                <div class="panel rounded-xl p-5">
-                    <h2 class="text-gray-800 font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
-                        <div class="p-1.5 bg-red-50 text-red-600 rounded-md"><i class="ph-bold ph-trend-up"></i></div>
-                        2. 牛顶卖出价 (USD)
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="input-group rounded-lg p-3 flex justify-between items-center bg-white shadow-sm">
-                            <label class="text-sm text-gray-600 font-medium">BTC 目标</label>
-                            <input type="number" id="bullBtcPrice" class="input-field text-right text-xl font-bold text-gray-900" value="150000">
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="input-group rounded-lg p-3">
-                                <label class="block text-xs text-gray-500 mb-1 font-medium">ETH 卖价</label>
-                                <input type="number" id="bullEthPrice" class="input-field text-base" value="8000">
-                            </div>
-                            <div class="input-group rounded-lg p-3">
-                                <label class="block text-xs text-gray-500 mb-1 font-medium">ADA 卖价</label>
-                                <input type="number" id="bullAdaPrice" class="input-field text-base" value="5">
-                            </div>
-                        </div>
-                        <div class="mt-2 p-3 bg-red-50 rounded-lg border border-red-100 text-xs text-red-600 flex gap-2 items-start font-medium">
-                            <i class="ph-fill ph-warning-circle mt-0.5 text-lg"></i>
-                            <span>纪律：清空 ETH/ADA，核心 BTC 锁仓不动。</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. 熊底抄底 -->
-                <div class="panel rounded-xl p-5">
-                    <h2 class="text-gray-800 font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
-                        <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-md"><i class="ph-bold ph-magnet"></i></div>
-                        3. 熊底接回价 (USD)
+                <!-- 1. 本轮实战参数 -->
+                <div class="panel p-5">
+                    <h2 class="text-gray-900 font-bold mb-4 flex items-center gap-2 text-xs uppercase tracking-wider border-b border-gray-100 pb-2">
+                        <i class="ph-bold ph-crosshair text-blue-600"></i> Cycle 1 实战部署
                     </h2>
                     
-                    <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 mb-4">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="text-xs text-emerald-700 font-bold">Ahr999 抄底线 (0.45)</span>
-                            <span class="text-sm font-mono font-bold text-emerald-600" id="ahr-target-price">$ --</span>
+                    <!-- 持仓 -->
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase">当前持仓 (2025)</span>
+                            <span class="text-[10px] text-blue-500 bg-blue-50 px-1.5 rounded cursor-pointer hover:bg-blue-100" onclick="alert('数据会自动保存')">Auto-saved</span>
                         </div>
-                        <button id="apply-smart-price" class="w-full py-1.5 bg-white text-emerald-600 text-xs font-bold rounded border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors shadow-sm">
-                            应用此建议价格
-                        </button>
+                        <div class="input-group px-3 py-2 flex justify-between border-l-4 border-l-btc">
+                            <label class="text-xs font-bold text-gray-500">BTC</label>
+                            <input type="number" id="currentBtc" class="input-field text-right" placeholder="0.00">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-group px-3 py-2 border-l-4 border-l-eth">
+                                <label class="text-[10px] font-bold text-gray-500 block">ETH</label>
+                                <input type="number" id="currentEth" class="input-field text-right text-xs">
+                            </div>
+                            <div class="input-group px-3 py-2 border-l-4 border-l-ada">
+                                <label class="text-[10px] font-bold text-gray-500 block">ADA</label>
+                                <input type="number" id="currentAda" class="input-field text-right text-xs">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="input-group rounded-lg p-3 border-l-4 border-l-usdt bg-white shadow-sm">
-                        <label class="block text-xs text-gray-500 mb-1 font-medium">您的 BTC 挂单价</label>
-                        <input type="number" id="bearBuyPrice" class="input-field text-xl font-bold text-gray-900">
+                    <!-- 目标 -->
+                    <div class="space-y-3">
+                        <div class="text-[10px] text-gray-400 font-bold uppercase">本轮目标 (决定 Alpha)</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="input-group px-3 py-2">
+                                <label class="text-[10px] text-gray-500 block mb-1">牛顶 ETH</label>
+                                <input type="number" id="bullEthPrice" class="input-field text-sm" value="8000">
+                            </div>
+                            <div class="input-group px-3 py-2">
+                                <label class="text-[10px] text-gray-500 block mb-1">牛顶 ADA</label>
+                                <input type="number" id="bullAdaPrice" class="input-field text-sm" value="5">
+                            </div>
+                        </div>
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1">牛顶 BTC (仅用于计价)</label>
+                            <input type="number" id="bullBtcPrice" class="input-field text-sm text-gray-600" value="150000">
+                        </div>
+                        <div class="input-group px-3 py-2 border-l-4 border-l-usdt bg-green-50/50 border-green-200">
+                            <label class="text-xs text-gray-600 font-bold block mb-1">熊底 BTC 接回价</label>
+                            <input type="number" id="bearBuyPrice" class="input-field text-lg font-bold text-green-700" value="69000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 宏观推演参数 -->
+                <div class="panel p-5 bg-gray-50">
+                    <h2 class="text-gray-900 font-bold mb-4 flex items-center gap-2 text-xs uppercase tracking-wider border-b border-gray-200 pb-2">
+                        <i class="ph-bold ph-binoculars text-purple-600"></i> 未来战略配置
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- 帆仓位比例 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-gray-600">未来帆仓位 (DCA Alts)</label>
+                                <span class="text-xs font-mono font-bold text-blue-600" id="disp-sail-alloc">60%</span>
+                            </div>
+                            <input type="range" id="sailAlloc" min="30" max="80" step="5" value="60" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-[10px] text-gray-400 mt-1">
+                                下一轮起：<span class="font-bold text-btc">40% 压舱</span> / <span class="font-bold text-blue-600">60% 进攻</span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-gray-600">机会收窄 (Alpha Decay)</label>
+                                <span class="text-xs font-mono font-bold text-purple-600" id="disp-decay">20%</span>
+                            </div>
+                            <input type="range" id="alphaDecay" min="0" max="50" step="5" value="20" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <p class="text-[10px] text-gray-400 mt-1">每轮超额收益减少 <span id="decay-val" class="font-bold">20%</span></p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-gray-600">推演轮次</label>
+                                <span class="text-xs font-mono font-bold text-gray-800" id="disp-cycles">3 Cycles</span>
+                            </div>
+                            <input type="range" id="simCycles" min="1" max="5" step="1" value="3" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-600">
+                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- 右侧：推演结果 (9列) -->
+            <!-- 右侧：推演详情 (9列) -->
             <div class="xl:col-span-9 space-y-8">
                 
-                <!-- 主流程图 -->
-                <div class="space-y-4">
-                    
-                    <!-- 阶段 1 -->
-                    <div class="panel rounded-xl p-6 flex flex-col md:flex-row gap-8 items-center md:items-stretch border-t-4 border-t-blue-500">
-                        <!-- 左侧：大数字 -->
-                        <div class="md:w-1/4 flex flex-col justify-center min-w-[200px]">
-                            <div class="text-xs text-blue-600 font-bold uppercase mb-2 tracking-widest">Phase 1: 起点</div>
-                            <div class="text-4xl font-mono font-bold text-gray-900 tracking-tighter" id="start-total-btc">--</div>
-                            <div class="text-sm text-gray-500 font-mono mt-1 font-medium" id="start-total-usd">$ --</div>
+                <!-- SECTION A: Cycle 1 深度复盘 -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded">CYCLE 1</span>
+                        <span class="text-sm font-bold text-gray-700">2025 (当前周期 - 激进模式)</span>
+                    </div>
+
+                    <!-- 1. 起点 -->
+                    <div class="panel p-5 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-[10px] text-gray-400 uppercase font-bold">Phase 1: 起点</div>
+                                <div class="text-2xl font-mono font-bold text-gray-900" id="c1-start-btc">-- BTC</div>
+                                <div class="text-xs text-gray-500 font-mono" id="c1-start-usd">$ --</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-400 uppercase font-bold">资产占比 (Value)</div>
+                                <div class="flex gap-2 mt-1" id="c1-start-pcts">
+                                    <!-- Injected -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 比例柱 -->
+                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-start">
+                            <!-- Injected -->
                         </div>
                         
-                        <!-- 右侧：详情 -->
-                        <div class="flex-1 w-full flex flex-col justify-center gap-4">
-                            <!-- 进度条 -->
-                            <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden flex shadow-inner" id="bar-start"></div>
-                            
-                            <!-- 数据表格 -->
-                            <div class="grid grid-cols-3 gap-6 text-sm">
-                                <div class="bg-gray-50 p-2 rounded border border-gray-100">
-                                    <div class="text-gray-500 mb-1 flex items-center gap-1.5 text-xs font-bold uppercase"><div class="w-2 h-2 bg-btc rounded-full"></div>BTC (锚)</div>
-                                    <div class="font-mono font-bold text-gray-800 text-base" id="start-btc-val">--</div>
-                                </div>
-                                <div class="bg-gray-50 p-2 rounded border border-gray-100">
-                                    <div class="text-gray-500 mb-1 flex items-center gap-1.5 text-xs font-bold uppercase"><div class="w-2 h-2 bg-eth rounded-full"></div>ETH</div>
-                                    <div class="font-mono font-bold text-gray-800 text-base" id="start-eth-val">--</div>
-                                </div>
-                                <div class="bg-gray-50 p-2 rounded border border-gray-100">
-                                    <div class="text-gray-500 mb-1 flex items-center gap-1.5 text-xs font-bold uppercase"><div class="w-2 h-2 bg-ada rounded-full"></div>ADA</div>
-                                    <div class="font-mono font-bold text-gray-800 text-base" id="start-ada-val">--</div>
-                                </div>
+                        <!-- 详情 -->
+                        <div class="grid grid-cols-3 gap-4 text-xs pt-2 border-t border-gray-50">
+                            <div>
+                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-btc rounded-full"></div>BTC</div>
+                                <div class="font-mono font-bold text-gray-700" id="c1-start-btc-val">--</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-eth rounded-full"></div>ETH</div>
+                                <div class="font-mono font-bold text-gray-700" id="c1-start-eth-val">--</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-ada rounded-full"></div>ADA</div>
+                                <div class="font-mono font-bold text-gray-700" id="c1-start-ada-val">--</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 连接线 -->
-                    <div class="flex justify-center -my-3 relative z-10">
-                        <div class="bg-white border border-gray-200 rounded-full p-1.5 text-gray-400 shadow-sm">
-                            <i class="ph-bold ph-arrow-down text-xl"></i>
-                        </div>
-                    </div>
+                    <div class="connector-line"></div>
 
-                    <!-- 阶段 2 -->
-                    <div class="panel rounded-xl p-6 flex flex-col md:flex-row gap-8 items-center md:items-stretch border-t-4 border-t-red-500 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-48 h-48 bg-red-100 rounded-full blur-3xl pointer-events-none opacity-50"></div>
-                        
-                        <!-- 左侧：大数字 -->
-                        <div class="md:w-1/4 flex flex-col justify-center min-w-[200px]">
-                            <div class="text-xs text-red-600 font-bold uppercase mb-2 tracking-widest">Phase 2: 牛顶</div>
-                            <div class="text-4xl font-mono font-bold text-gray-900 tracking-tighter" id="bull-total-btc">--</div>
-                            <div class="text-sm text-gray-500 font-mono mt-1 font-medium">峰值: <span id="bull-total-usd" class="text-gray-700">--</span></div>
-                        </div>
-
-                        <!-- 右侧：详情 -->
-                        <div class="flex-1 w-full flex flex-col justify-center gap-4 relative z-10">
-                            <div class="flex justify-between items-end">
-                                <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden flex mr-6 shadow-inner" id="bar-bull"></div>
-                                <div class="text-right min-w-max bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg border border-green-200 shadow-sm">
-                                    <div class="text-[10px] text-usdt font-black uppercase mb-0.5">收割弹药 (USDT)</div>
-                                    <div class="text-xl font-mono font-bold text-usdt leading-none" id="harvested-ammo">--</div>
+                    <!-- 2. 牛顶收割 -->
+                    <div class="panel p-5 flex flex-col gap-4 relative border-l-4 border-l-red-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-[10px] text-red-500 uppercase font-bold">Phase 2: 牛顶</div>
+                                <div class="text-2xl font-mono font-bold text-gray-900" id="c1-bull-btc">-- BTC</div>
+                                <div class="text-xs text-gray-500 font-mono">Val: <span id="c1-bull-usd">--</span></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-400 uppercase font-bold">峰值占比</div>
+                                <div class="flex gap-2 mt-1" id="c1-bull-pcts">
+                                    <!-- Injected -->
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="grid grid-cols-3 gap-6 text-sm border-t border-gray-100 pt-3">
-                                <div class="opacity-60">
-                                    <div class="text-gray-500 mb-1 text-xs font-bold">BTC (保留)</div>
-                                    <div class="font-mono text-gray-700" id="bull-btc-val">--</div>
-                                </div>
-                                <div>
-                                    <div class="text-red-500 mb-1 text-xs font-bold">ETH (卖出)</div>
-                                    <div class="font-mono font-bold text-gray-900" id="bull-eth-val">--</div>
-                                </div>
-                                <div>
-                                    <div class="text-red-500 mb-1 text-xs font-bold">ADA (卖出)</div>
-                                    <div class="font-mono font-bold text-gray-900" id="bull-ada-val">--</div>
-                                </div>
+                        <!-- 比例柱 -->
+                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-bull">
+                            <!-- Injected -->
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
+                            <div class="text-xs text-gray-400">
+                                策略：<span class="text-red-500 font-bold">卖出 ETH/ADA</span>, <span class="text-gray-700 font-bold">保留 BTC</span>
+                            </div>
+                            <div class="bg-green-50 border border-green-200 rounded px-3 py-1 text-right">
+                                <div class="text-[10px] text-green-600 font-bold uppercase">收获 USDT</div>
+                                <div class="text-base font-mono font-black text-green-600" id="c1-ammo">$--</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 连接线 -->
-                    <div class="flex justify-center -my-3 relative z-10">
-                        <div class="bg-white border border-gray-200 rounded-full p-1.5 text-gray-400 shadow-sm">
-                            <i class="ph-bold ph-arrow-down text-xl"></i>
-                        </div>
-                    </div>
+                    <div class="connector-line"></div>
 
-                    <!-- 阶段 3 -->
-                    <div class="panel rounded-xl p-6 flex flex-col md:flex-row gap-8 items-center md:items-stretch border-t-4 border-t-usdt bg-gradient-to-b from-green-50/50 to-white">
-                        
-                        <!-- 左侧：大数字 -->
-                        <div class="md:w-1/4 flex flex-col justify-center min-w-[200px]">
-                            <div class="text-xs text-usdt font-bold uppercase mb-2 tracking-widest">Phase 3: 最终</div>
-                            <div class="text-5xl font-mono font-bold text-btc tracking-tighter drop-shadow-sm" id="end-total-btc">--</div>
-                            <div class="text-sm text-gray-500 font-mono mt-1 font-medium">熊底价值: <span id="end-total-usd" class="text-gray-700">--</span></div>
-                        </div>
-
-                        <!-- 右侧：详情 -->
-                        <div class="flex-1 w-full flex flex-col justify-center gap-4">
-                            <div class="w-full h-5 bg-gray-200 rounded-full overflow-hidden flex shadow-inner" id="bar-end"></div>
-                            
-                            <div class="grid grid-cols-2 gap-6 text-sm pt-1">
-                                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex justify-between items-center">
-                                    <div>
-                                        <div class="text-gray-500 text-[10px] font-bold uppercase mb-0.5">⚓ 原始锚仓位</div>
-                                        <div class="font-mono text-btc font-bold text-lg" id="end-anchor-val">--</div>
-                                    </div>
-                                    <div class="text-right text-gray-400 font-mono text-xs" id="end-anchor-detail">--</div>
-                                </div>
-                                <div class="bg-green-50 p-3 rounded-lg border border-green-200 shadow-sm flex justify-between items-center">
-                                    <div>
-                                        <div class="text-usdt text-[10px] font-bold uppercase mb-0.5">⛵ 帆带回利润</div>
-                                        <div class="font-mono text-usdt font-bold text-lg" id="end-sail-val">--</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-usdt font-mono font-black text-xl" id="sail-multiplier">--x</div>
-                                        <div class="text-green-600/60 font-mono text-xs" id="end-sail-detail">--</div>
-                                    </div>
+                    <!-- 3. 熊底重仓 -->
+                    <div class="panel p-5 flex flex-col gap-4 border-l-4 border-l-usdt bg-gradient-to-r from-green-50/30 to-white">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-[10px] text-green-600 uppercase font-bold">Phase 3: 熊底 (100% BTC)</div>
+                                <div class="text-3xl font-mono font-bold text-gray-900" id="c1-end-btc">-- BTC</div>
+                                <div class="text-xs text-gray-500 font-mono">Val: <span id="c1-end-usd">--</span></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-400 uppercase font-bold">BTC 来源构成</div>
+                                <div class="flex gap-2 mt-1" id="c1-end-pcts">
+                                    <!-- Injected -->
                                 </div>
                             </div>
                         </div>
-                    </div>
 
+                        <!-- 比例柱 (BTC 构成) -->
+                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-end">
+                            <!-- Injected -->
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-gray-50">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 font-bold flex items-center gap-1"><div class="w-1.5 h-1.5 bg-btc rounded-full"></div>老本 (Anchor)</span>
+                                <span class="font-mono font-bold text-gray-900" id="c1-res-anchor">--</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-green-600 font-bold flex items-center gap-1"><div class="w-1.5 h-1.5 bg-usdt rounded-full"></div>利润 (New Sail)</span>
+                                <span class="font-mono font-bold text-green-700" id="c1-res-sail">--</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 图表区 -->
-                <div class="panel rounded-xl p-6 h-80 bg-white">
-                    <canvas id="growthChart"></canvas>
+                <!-- SECTION B: 宏观未来 -->
+                <div class="space-y-4 pt-6 border-t border-gray-200">
+                    <div class="flex justify-between items-end">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded">FUTURE</span>
+                            <span class="text-sm font-bold text-gray-700">宏观财富路径推演 (4年减半周期)</span>
+                        </div>
+                        <div class="text-xs text-gray-400">基于 <span id="lbl-sail-alloc" class="font-bold text-blue-600">60%</span> 帆仓位配置</div>
+                    </div>
+
+                    <!-- 终极图表 -->
+                    <div class="panel p-6 h-80 bg-white">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+
+                    <!-- 汇总数据 -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="panel p-4 bg-gray-50">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Cycle 1 净增</div>
+                            <div class="text-xl font-mono font-bold text-green-600" id="gain-c1">-- BTC</div>
+                        </div>
+                        <div class="panel p-4 bg-gray-50">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">后续轮次复利</div>
+                            <div class="text-xl font-mono font-bold text-purple-600" id="gain-future">-- BTC</div>
+                        </div>
+                        <div class="panel p-4 bg-gray-900 text-white">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">最终总资产</div>
+                            <div class="text-2xl font-mono font-bold text-btc" id="gain-total">-- BTC</div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -349,93 +364,112 @@
     </div>
 
 <script>
-    // --- State Management ---
+    // --- State ---
     const state = {
         holdings: { btc: 0.0871, eth: 4.5603, ada: 45029.7432 },
         prices: { btc: 0, eth: 0, ada: 0 },
         targets: { btc: 150000, eth: 8000, ada: 5 },
         bear: { buyPrice: 69000 },
-        ahr: { value: 0, targetPrice: 0 }
+        macro: { decay: 0.20, cycles: 3, sailAlloc: 0.60 },
+        ahr: { value: 0 }
     };
 
-    // --- DOM Helpers ---
+    // --- DOM & Vars ---
     const $ = (id) => document.getElementById(id);
     let chartInstance = null;
 
-    // --- Formatting ---
+    // --- Formatter ---
     const fmt = {
         usd: (n, d=0) => '$' + new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(n),
-        btc: n => new Intl.NumberFormat('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 }).format(n) + ' BTC',
-        pct: n => n.toFixed(1) + '%',
-        num: (n, d=2) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(n)
+        btc: (n, d=4) => new Intl.NumberFormat('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n),
+        num: (n, d=2) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d }).format(n),
+        pct: (n, d=1) => n.toFixed(d) + '%'
     };
 
-    // --- Initialization ---
+    // --- Init ---
     function init() {
         loadState();
         bindEvents();
+        updateInputs();
         fetchData();
     }
 
-    // --- Data & Logic ---
+    function updateInputs() {
+        const setVal = (id, val) => { const el = $(id); if(el) el.value = val; };
+        setVal('currentBtc', state.holdings.btc);
+        setVal('currentEth', state.holdings.eth);
+        setVal('currentAda', state.holdings.ada);
+        setVal('bullBtcPrice', state.targets.btc);
+        setVal('bullEthPrice', state.targets.eth);
+        setVal('bullAdaPrice', state.targets.ada);
+        setVal('bearBuyPrice', state.bear.buyPrice);
+        setVal('alphaDecay', state.macro.decay * 100);
+        setVal('simCycles', state.macro.cycles);
+        setVal('sailAlloc', state.macro.sailAlloc * 100);
+        
+        $('disp-decay').textContent = (state.macro.decay * 100) + '%';
+        $('decay-val').textContent = (state.macro.decay * 100) + '%';
+        $('disp-cycles').textContent = state.macro.cycles + ' Cycles';
+        $('disp-sail-alloc').textContent = (state.macro.sailAlloc * 100) + '%';
+        $('lbl-sail-alloc').textContent = (state.macro.sailAlloc * 100) + '%';
+    }
+
     function bindEvents() {
-        const bind = (id, obj, key) => {
-            const el = $(id);
-            if(el) {
-                el.value = obj[key];
-                el.addEventListener('input', (e) => { 
-                    obj[key] = parseFloat(e.target.value) || 0; 
-                    update(); 
-                });
-            }
-        };
+        const onIn = (id, cb) => { const el = $(id); if(el) el.addEventListener('input', cb); };
+        
+        onIn('currentBtc', e => { state.holdings.btc = parseFloat(e.target.value) || 0; update(); });
+        onIn('currentEth', e => { state.holdings.eth = parseFloat(e.target.value) || 0; update(); });
+        onIn('currentAda', e => { state.holdings.ada = parseFloat(e.target.value) || 0; update(); });
+        
+        onIn('bullBtcPrice', e => { state.targets.btc = parseFloat(e.target.value) || 0; update(); });
+        onIn('bullEthPrice', e => { state.targets.eth = parseFloat(e.target.value) || 0; update(); });
+        onIn('bullAdaPrice', e => { state.targets.ada = parseFloat(e.target.value) || 0; update(); });
+        onIn('bearBuyPrice', e => { state.bear.buyPrice = parseFloat(e.target.value) || 0; update(); });
 
-        bind('currentBtc', state.holdings, 'btc');
-        bind('currentEth', state.holdings, 'eth');
-        bind('currentAda', state.holdings, 'ada');
-        bind('bullBtcPrice', state.targets, 'btc');
-        bind('bullEthPrice', state.targets, 'eth');
-        bind('bullAdaPrice', state.targets, 'ada');
-        bind('bearBuyPrice', state.bear, 'buyPrice');
-
-        $('refresh-btn').addEventListener('click', fetchData);
-        $('apply-smart-price').addEventListener('click', () => {
-            if (state.ahr.targetPrice > 0) {
-                state.bear.buyPrice = parseFloat(state.ahr.targetPrice.toFixed(0));
-                $('bearBuyPrice').value = state.bear.buyPrice;
-                update();
-            }
+        onIn('alphaDecay', e => { 
+            state.macro.decay = parseInt(e.target.value) / 100; 
+            $('disp-decay').textContent = e.target.value + '%';
+            $('decay-val').textContent = e.target.value + '%';
+            update(); 
         });
+        
+        onIn('simCycles', e => { 
+            state.macro.cycles = parseInt(e.target.value); 
+            $('disp-cycles').textContent = e.target.value + ' Cycles';
+            update(); 
+        });
+
+        onIn('sailAlloc', e => {
+            state.macro.sailAlloc = parseInt(e.target.value) / 100;
+            $('disp-sail-alloc').textContent = e.target.value + '%';
+            $('lbl-sail-alloc').textContent = e.target.value + '%';
+            update();
+        });
+
+        const btn = $('refresh-btn');
+        if(btn) btn.addEventListener('click', fetchData);
     }
 
-    function saveState() {
-        localStorage.setItem('gemini_sail_v3_3', JSON.stringify({
-            holdings: state.holdings,
-            targets: state.targets,
-            bear: state.bear
-        }));
-    }
-
+    function saveState() { localStorage.setItem('gemini_sail_v5_3', JSON.stringify(state)); }
     function loadState() {
-        const saved = localStorage.getItem('gemini_sail_v3_3');
+        const saved = localStorage.getItem('gemini_sail_v5_3');
         if (saved) {
             const parsed = JSON.parse(saved);
             state.holdings = { ...state.holdings, ...parsed.holdings };
             state.targets = { ...state.targets, ...parsed.targets };
             state.bear = { ...state.bear, ...parsed.bear };
+            state.macro = { ...state.macro, ...parsed.macro };
         }
     }
 
     async function fetchData() {
         const btn = $('refresh-btn');
-        btn.classList.add('animate-spin');
+        if(btn) btn.classList.add('animate-spin');
         try {
-            // 1. Prices
             const resPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,cardano&vs_currencies=usd');
             const dataPrice = await resPrice.json();
             state.prices = { btc: dataPrice.bitcoin.usd, eth: dataPrice.ethereum.usd, ada: dataPrice.cardano.usd };
 
-            // 2. Ahr999 Logic
             const resHist = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=200&interval=daily');
             const dataHist = await resHist.json();
             const prices = dataHist.prices.map(p => p[1]);
@@ -447,146 +481,212 @@
             const fittingPrice = Math.pow(10, (5.84 * Math.log10(daysSinceGenesis) - 17.01));
             
             state.ahr.value = (state.prices.btc / ma200) * (state.prices.btc / fittingPrice);
-            state.ahr.targetPrice = Math.sqrt(0.45 * ma200 * fittingPrice);
 
             renderHeader();
             update();
         } catch (e) {
             console.error(e);
         } finally {
-            btn.classList.remove('animate-spin');
+            if(btn) btn.classList.remove('animate-spin');
         }
     }
 
     function renderHeader() {
-        $('price-btc').textContent = fmt.usd(state.prices.btc);
-        $('price-eth').textContent = fmt.usd(state.prices.eth);
-        $('price-ada').textContent = fmt.usd(state.prices.ada, 3); // Show 3 decimals for ADA
-        $('ahr-value').textContent = state.ahr.value.toFixed(2);
-        $('ahr-target-price').textContent = fmt.usd(state.ahr.targetPrice);
+        const setTxt = (id, txt) => { const el = $(id); if(el) el.textContent = txt; };
+        setTxt('price-btc', fmt.usd(state.prices.btc));
+        setTxt('price-eth', fmt.usd(state.prices.eth));
+        setTxt('price-ada', fmt.usd(state.prices.ada, 3));
+        setTxt('ahr-value', state.ahr.value.toFixed(2));
     }
 
     function update() {
         saveState();
         if (!state.prices.btc) return;
 
-        // Calculations
-        // 1. Start
-        const valStart = {
-            btc: state.holdings.btc * state.prices.btc,
-            eth: state.holdings.eth * state.prices.eth,
-            ada: state.holdings.ada * state.prices.ada
-        };
-        const totStart = valStart.btc + valStart.eth + valStart.ada;
+        // --- Cycle 1 Calculation ---
+        // Start Values (USD)
+        const c1_val_btc = state.holdings.btc * state.prices.btc;
+        const c1_val_eth = state.holdings.eth * state.prices.eth;
+        const c1_val_ada = state.holdings.ada * state.prices.ada;
+        const c1_start_usd = c1_val_btc + c1_val_eth + c1_val_ada;
+        const c1_start_btc_eq = c1_start_usd / state.prices.btc;
         
-        // 2. Bull
-        const valBull = {
-            btc: state.holdings.btc * state.targets.btc,
-            eth: state.holdings.eth * state.targets.eth,
-            ada: state.holdings.ada * state.targets.ada
-        };
-        const totBull = valBull.btc + valBull.eth + valBull.ada;
-        const ammo = valBull.eth + valBull.ada;
+        const pct_start_btc = c1_val_btc / c1_start_usd * 100;
+        const pct_start_eth = c1_val_eth / c1_start_usd * 100;
+        const pct_start_ada = c1_val_ada / c1_start_usd * 100;
 
-        // 3. End
-        const newBtc = state.bear.buyPrice ? ammo / state.bear.buyPrice : 0;
-        const endTotalBtc = state.holdings.btc + newBtc;
-        const endTotalUsd = endTotalBtc * state.bear.buyPrice;
-        const multiplier = (state.holdings.eth || state.holdings.ada) ? newBtc / (state.holdings.eth * (state.prices.eth/state.prices.btc) + state.holdings.ada * (state.prices.ada/state.prices.btc)) : 0;
+        // Bull Values (USD)
+        const c1_bull_btc = state.holdings.btc * state.targets.btc; // Held
+        const c1_bull_eth = state.holdings.eth * state.targets.eth;
+        const c1_bull_ada = state.holdings.ada * state.targets.ada;
+        const c1_ammo = c1_bull_eth + c1_bull_ada;
+        const c1_bull_usd = c1_bull_btc + c1_ammo;
+        const c1_bull_btc_eq = c1_bull_usd / state.targets.btc;
 
-        // Renders
-        // Phase 1
-        $('start-total-btc').textContent = fmt.btc(state.holdings.btc + (valStart.eth + valStart.ada) / state.prices.btc);
-        $('start-total-usd').textContent = fmt.usd(totStart);
+        const pct_bull_btc = c1_bull_btc / c1_bull_usd * 100;
+        const pct_bull_eth = c1_bull_eth / c1_bull_usd * 100;
+        const pct_bull_ada = c1_bull_ada / c1_bull_usd * 100;
+
+        // Bear (End of C1)
+        const c1_new_btc = c1_ammo / state.bear.buyPrice;
+        const c1_end_btc = state.holdings.btc + c1_new_btc;
+        const c1_end_usd = c1_end_btc * state.bear.buyPrice;
+
+        const pct_end_anchor = (state.holdings.btc / c1_end_btc) * 100;
+        const pct_end_sail = (c1_new_btc / c1_end_btc) * 100;
+
+        // Alpha Logic (Sail Performance)
+        const sail_start_btc_eq = (c1_val_eth + c1_val_ada) / state.prices.btc;
+        const c1_alpha = sail_start_btc_eq > 0 ? c1_new_btc / sail_start_btc_eq : 1;
+
+        // --- Macro Loop (Cycle 2+) ---
+        const chartLabels = ['起点 (2025)'];
+        const chartData = [c1_start_btc_eq];
+        let currentBtc = c1_end_btc;
+        let currentAlpha = c1_alpha;
         
-        const pctStart = { btc: valStart.btc/totStart*100, eth: valStart.eth/totStart*100, ada: valStart.ada/totStart*100 };
+        chartLabels.push('Cycle 1 (~2026)');
+        chartData.push(c1_end_btc);
+
+        for(let i=2; i<=state.macro.cycles; i++) {
+            const startYear = 2025 + (i-1)*4;
+            chartLabels.push(`Cycle ${i} (~${startYear+1})`);
+            
+            // Apply Decay to Alpha
+            currentAlpha = 1 + ((currentAlpha - 1) * (1 - state.macro.decay));
+            if(currentAlpha < 1) currentAlpha = 1;
+            
+            // Configurable Split for Future Cycles
+            const sailRatio = state.macro.sailAlloc; // e.g., 0.6
+            const anchorRatio = 1 - sailRatio;       // e.g., 0.4
+            
+            const anchor = currentBtc * anchorRatio;
+            const sail = currentBtc * sailRatio;
+            
+            // Sail grows by Alpha
+            const newSail = sail * currentAlpha;
+            currentBtc = anchor + newSail;
+            
+            chartData.push(currentBtc);
+        }
+
+        // --- Render UI ---
+        const setTxt = (id, txt) => { const el = $(id); if(el) el.textContent = txt; };
+        
+        // Phase 1 Render
+        setTxt('c1-start-btc', fmt.btc(c1_start_btc_eq));
+        setTxt('c1-start-usd', fmt.usd(c1_start_usd));
+        $('c1-start-pcts').innerHTML = `
+            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_start_btc)}</span>
+            <span class="text-[10px] font-bold text-eth bg-purple-50 px-1 rounded">${fmt.pct(pct_start_eth)}</span>
+            <span class="text-[10px] font-bold text-ada bg-blue-50 px-1 rounded">${fmt.pct(pct_start_ada)}</span>
+        `;
         $('bar-start').innerHTML = `
-            <div style="width:${pctStart.btc}%" class="bg-btc h-full" title="BTC: ${fmt.pct(pctStart.btc)}"></div>
-            <div style="width:${pctStart.eth}%" class="bg-eth h-full" title="ETH: ${fmt.pct(pctStart.eth)}"></div>
-            <div style="width:${pctStart.ada}%" class="bg-ada h-full" title="ADA: ${fmt.pct(pctStart.ada)}"></div>
+            <div style="width:${pct_start_btc}%" class="bar-segment bg-btc h-full flex items-center justify-center" title="BTC">${pct_start_btc>10?'BTC':''}</div>
+            <div style="width:${pct_start_eth}%" class="bar-segment bg-eth h-full flex items-center justify-center" title="ETH">${pct_start_eth>10?'ETH':''}</div>
+            <div style="width:${pct_start_ada}%" class="bar-segment bg-ada h-full flex items-center justify-center" title="ADA">${pct_start_ada>10?'ADA':''}</div>
         `;
-        $('start-btc-val').textContent = fmt.usd(valStart.btc);
-        $('start-eth-val').textContent = fmt.usd(valStart.eth);
-        $('start-ada-val').textContent = fmt.usd(valStart.ada);
+        setTxt('c1-start-btc-val', fmt.num(state.holdings.btc, 4));
+        setTxt('c1-start-eth-val', fmt.num(state.holdings.eth));
+        setTxt('c1-start-ada-val', fmt.num(state.holdings.ada, 0));
 
-        // Phase 2
-        $('bull-total-btc').textContent = fmt.btc(state.holdings.btc + (valBull.eth + valBull.ada) / state.targets.btc);
-        $('bull-total-usd').textContent = fmt.usd(totBull);
-        $('harvested-ammo').textContent = fmt.usd(ammo);
-        
-        const pctBull = { btc: valBull.btc/totBull*100, eth: valBull.eth/totBull*100, ada: valBull.ada/totBull*100 };
+        // Phase 2 Render
+        setTxt('c1-bull-btc', fmt.btc(c1_bull_btc_eq));
+        setTxt('c1-bull-usd', fmt.usd(c1_bull_usd));
+        $('c1-bull-pcts').innerHTML = `
+            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_bull_btc)}</span>
+            <span class="text-[10px] font-bold text-eth bg-purple-50 px-1 rounded">${fmt.pct(pct_bull_eth)}</span>
+            <span class="text-[10px] font-bold text-ada bg-blue-50 px-1 rounded">${fmt.pct(pct_bull_ada)}</span>
+        `;
         $('bar-bull').innerHTML = `
-            <div style="width:${pctBull.btc}%" class="bg-btc h-full opacity-50" title="BTC保留"></div>
-            <div style="width:${pctBull.eth}%" class="bg-eth h-full" title="ETH卖出"></div>
-            <div style="width:${pctBull.ada}%" class="bg-ada h-full" title="ADA卖出"></div>
+            <div style="width:${pct_bull_btc}%" class="bar-segment bg-btc h-full opacity-60 flex items-center justify-center">BTC</div>
+            <div style="width:${pct_bull_eth}%" class="bar-segment bg-eth h-full flex items-center justify-center">ETH</div>
+            <div style="width:${pct_bull_ada}%" class="bar-segment bg-ada h-full flex items-center justify-center">ADA</div>
         `;
-        $('bull-btc-val').textContent = fmt.usd(valBull.btc);
-        $('bull-eth-val').textContent = fmt.usd(valBull.eth);
-        $('bull-ada-val').textContent = fmt.usd(valBull.ada);
+        setTxt('c1-ammo', fmt.usd(c1_ammo));
 
-        // Phase 3
-        $('end-total-btc').textContent = fmt.btc(endTotalBtc);
-        $('end-total-usd').textContent = fmt.usd(endTotalUsd);
-        $('sail-multiplier').textContent = multiplier > 0 ? multiplier.toFixed(2) + 'x' : '-';
-        
-        const pctEnd = { anchor: state.holdings.btc/endTotalBtc*100, sail: newBtc/endTotalBtc*100 };
+        // Phase 3 Render
+        setTxt('c1-end-btc', fmt.btc(c1_end_btc));
+        setTxt('c1-end-usd', fmt.usd(c1_end_usd));
+        $('c1-end-pcts').innerHTML = `
+            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_end_anchor)}</span>
+            <span class="text-[10px] font-bold text-usdt bg-green-50 px-1 rounded">${fmt.pct(pct_end_sail)}</span>
+        `;
         $('bar-end').innerHTML = `
-            <div style="width:${pctEnd.anchor}%" class="bg-btc h-full" title="原始锚"></div>
-            <div style="width:${pctEnd.sail}%" class="bg-usdt h-full" title="新获BTC"></div>
+            <div style="width:${pct_end_anchor}%" class="bar-segment bg-btc h-full flex items-center justify-center">老本</div>
+            <div style="width:${pct_end_sail}%" class="bar-segment bg-usdt h-full flex items-center justify-center">利润</div>
         `;
-        
-        $('end-anchor-val').textContent = fmt.btc(state.holdings.btc);
-        $('end-anchor-detail').textContent = fmt.usd(state.holdings.btc * state.bear.buyPrice);
-        $('end-sail-val').textContent = '+' + fmt.btc(newBtc);
-        $('end-sail-detail').textContent = fmt.usd(newBtc * state.bear.buyPrice);
+        setTxt('c1-res-anchor', fmt.btc(state.holdings.btc));
+        setTxt('c1-res-sail', '+' + fmt.btc(c1_new_btc));
 
-        renderChart(state.holdings.btc, (valStart.eth+valStart.ada)/state.prices.btc, newBtc);
+        // Macro Stats
+        setTxt('gain-c1', '+' + fmt.btc(c1_end_btc - c1_start_btc_eq));
+        setTxt('gain-future', '+' + fmt.btc(currentBtc - c1_end_btc));
+        setTxt('gain-total', fmt.btc(currentBtc));
+
+        renderChart(chartLabels, chartData, c1_start_btc_eq);
     }
 
-    function renderChart(anchor, sailStart, sailEnd) {
-        const ctx = $('growthChart').getContext('2d');
+    function renderChart(labels, data, startBtc) {
+        const ctx = $('macroChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
 
-        // Chart.js Colors for Light Mode
-        const gridColor = '#E5E7EB';
-        const tickColor = '#6B7280';
+        const hodlData = Array(labels.length).fill(startBtc);
+
+        // Colors
+        const brandColor = '#2563EB'; // Blue
+        const hodlColor = '#9CA3AF'; // Gray
 
         chartInstance = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ['起点 (BTC等值)', '终点 (BTC实物)'],
+                labels: labels,
                 datasets: [
-                    { label: '锚 (BTC)', data: [anchor, anchor], backgroundColor: '#F59E0B', stack: '0' }, // BTC Amber
-                    { label: '帆 (山寨/增量)', data: [sailStart, 0], backgroundColor: '#8B5CF6', stack: '0' }, // ETH Purple
-                    { label: '新收益', data: [0, sailEnd], backgroundColor: '#10B981', stack: '0' } // USDT Green
+                    {
+                        label: '策略复利增长',
+                        data: data,
+                        borderColor: brandColor,
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: brandColor,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: '躺平持币 (Hodl)',
+                        data: hodlData,
+                        borderColor: hodlColor,
+                        borderWidth: 2,
+                        borderDash: [6, 6],
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        tension: 0,
+                        fill: false
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { 
-                        display: true, 
-                        labels: { color: '#374151', font: { family: 'Inter', size: 12 } } 
-                    },
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { family: 'Inter' }, usePointStyle: true } },
                     tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.9)', // Dark tooltip for contrast
-                        titleColor: '#F9FAFB',
-                        bodyColor: '#D1D5DB',
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        titleColor: '#fff',
+                        bodyFont: { family: 'JetBrains Mono' },
                         padding: 12,
                         cornerRadius: 8,
-                        displayColors: true
+                        callbacks: {
+                            label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(2)} BTC`
+                        }
                     }
                 },
                 scales: {
-                    x: { 
-                        grid: { display: false }, 
-                        ticks: { color: tickColor, font: { family: 'Inter' } } 
-                    },
-                    y: { 
-                        grid: { color: gridColor, drawBorder: false }, 
-                        ticks: { color: tickColor, font: { family: 'JetBrains Mono' } } 
-                    }
+                    x: { grid: { display: false }, ticks: { font: { family: 'Inter' }, color: '#6B7280' } },
+                    y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'JetBrains Mono' }, color: '#6B7280' } }
                 }
             }
         });
