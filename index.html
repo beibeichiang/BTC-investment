@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>锚与帆 | 深度实战推演 v5.3</title>
+    <title>锚与帆 | 深度实战推演 v5.8 (智能记忆版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -21,9 +22,13 @@
                     },
                     colors: {
                         btc: '#F7931A',
-                        eth: '#8B5CF6', // ETH 紫色
-                        ada: '#2563EB', // ADA 蓝色
+                        eth: '#8B5CF6',
+                        ada: '#2563EB',
                         usdt: '#10B981',
+                        life: '#EC4899',
+                        house: '#F97316',
+                        family: '#8B5CF6',
+                        buffett: '#4B5563',
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
@@ -39,40 +44,11 @@
         .input-group { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0.5rem; transition: all 0.2s; }
         .input-group:focus-within { background: #FFF; border-color: #9CA3AF; box-shadow: 0 0 0 3px rgba(229, 231, 235, 0.5); }
         .num-font { font-family: 'JetBrains Mono', monospace; }
-        
-        /* 虚线连接效果 */
-        .connector-line {
-            border-left: 2px dashed #D1D5DB;
-            margin-left: 1.5rem;
-            height: 2rem;
-        }
-        
-        /* 比例柱动画 */
+        .connector-line { border-left: 2px dashed #D1D5DB; margin-left: 1.5rem; height: 2rem; }
         .bar-segment { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* 滑块样式 */
-        input[type=range] {
-            -webkit-appearance: none; 
-            width: 100%; 
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #4B5563;
-            cursor: pointer;
-            margin-top: -6px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #E5E7EB;
-            border-radius: 2px;
-        }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #4B5563; cursor: pointer; margin-top: -6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E5E7EB; border-radius: 2px; }
     </style>
 </head>
 <body class="min-h-screen p-6 md:p-10 text-sm">
@@ -83,11 +59,11 @@
         <header class="flex flex-col md:flex-row justify-between items-center gap-6 pb-6 border-b border-gray-200">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-white border border-gray-200 rounded-2xl flex items-center justify-center text-btc shadow-soft">
-                    <i class="ph-fill ph-strategy text-3xl"></i>
+                    <i class="ph-fill ph-floppy-disk text-3xl text-blue-600"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">锚与帆 <span class="text-gray-400 font-normal text-sm ml-2 bg-gray-100 px-2 py-0.5 rounded-full">v5.3 Strategy Shift</span></h1>
-                    <p class="text-gray-500 text-xs font-medium mt-0.5">Cycle 1 激进进攻 ➔ Cycle 2+ 稳健复利</p>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">锚与帆 <span class="text-gray-400 font-normal text-sm ml-2 bg-gray-100 px-2 py-0.5 rounded-full">v5.8 Auto-Save</span></h1>
+                    <p class="text-gray-500 text-xs font-medium mt-0.5">智能记忆版 | 最佳默认配置 (50/50)</p>
                 </div>
             </div>
             
@@ -115,17 +91,16 @@
             <!-- 左侧：控制台 (3列) -->
             <div class="xl:col-span-3 space-y-6">
                 
-                <!-- 1. 本轮实战参数 -->
+                <!-- 1. Cycle 1 实战 -->
                 <div class="panel p-5">
                     <h2 class="text-gray-900 font-bold mb-4 flex items-center gap-2 text-xs uppercase tracking-wider border-b border-gray-100 pb-2">
-                        <i class="ph-bold ph-crosshair text-blue-600"></i> Cycle 1 实战部署
+                        <i class="ph-bold ph-crosshair text-blue-600"></i> Cycle 1 实战
                     </h2>
                     
-                    <!-- 持仓 -->
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-gray-400 font-bold uppercase">当前持仓 (2025)</span>
-                            <span class="text-[10px] text-blue-500 bg-blue-50 px-1.5 rounded cursor-pointer hover:bg-blue-100" onclick="alert('数据会自动保存')">Auto-saved</span>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase">当前持仓</span>
+                            <span class="text-[10px] text-green-600 bg-green-50 px-1.5 rounded border border-green-100 flex items-center gap-1"><i class="ph-bold ph-check"></i> 已保存</span>
                         </div>
                         <div class="input-group px-3 py-2 flex justify-between border-l-4 border-l-btc">
                             <label class="text-xs font-bold text-gray-500">BTC</label>
@@ -143,9 +118,8 @@
                         </div>
                     </div>
 
-                    <!-- 目标 -->
                     <div class="space-y-3">
-                        <div class="text-[10px] text-gray-400 font-bold uppercase">本轮目标 (决定 Alpha)</div>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase">本轮目标</div>
                         <div class="grid grid-cols-2 gap-2">
                             <div class="input-group px-3 py-2">
                                 <label class="text-[10px] text-gray-500 block mb-1">牛顶 ETH</label>
@@ -157,7 +131,7 @@
                             </div>
                         </div>
                         <div class="input-group px-3 py-2">
-                            <label class="text-[10px] text-gray-500 block mb-1">牛顶 BTC (仅用于计价)</label>
+                            <label class="text-[10px] text-gray-500 block mb-1">牛顶 BTC (计价)</label>
                             <input type="number" id="bullBtcPrice" class="input-field text-sm text-gray-600" value="150000">
                         </div>
                         <div class="input-group px-3 py-2 border-l-4 border-l-usdt bg-green-50/50 border-green-200">
@@ -167,40 +141,101 @@
                     </div>
                 </div>
 
-                <!-- 2. 宏观推演参数 -->
+                <!-- 2. 人生开销预算 -->
+                <div class="panel p-5 bg-white border-l-4 border-l-life">
+                    <h2 class="text-gray-900 font-bold mb-4 flex items-center gap-2 text-xs uppercase tracking-wider border-b border-gray-100 pb-2">
+                        <i class="ph-bold ph-heart text-life"></i> 人生/家庭预算
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1 flex justify-between">
+                                <span>妈妈西昌装修</span>
+                                <span class="text-family font-bold">~2026</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">$</span>
+                                <input type="number" id="costMomHouse" class="input-field text-sm text-family" value="10000">
+                            </div>
+                        </div>
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1 flex justify-between">
+                                <span>2030 冻卵</span>
+                                <span class="text-life font-bold">~2030</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">$</span>
+                                <input type="number" id="costEgg" class="input-field text-sm text-life" value="20000">
+                            </div>
+                        </div>
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1 flex justify-between">
+                                <span>父母医疗储备金</span>
+                                <span class="text-red-500 font-bold">备用</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">$</span>
+                                <input type="number" id="costMedical" class="input-field text-sm text-red-500" value="30000">
+                            </div>
+                        </div>
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1 flex justify-between">
+                                <span>上海置业储备</span>
+                                <span class="text-house font-bold">长期</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">$</span>
+                                <input type="number" id="costShanghai" class="input-field text-sm text-house" value="500000">
+                            </div>
+                        </div>
+                        <div class="input-group px-3 py-2">
+                            <label class="text-[10px] text-gray-500 block mb-1 flex justify-between">
+                                <span>2034 美国代孕</span>
+                                <span class="text-life font-bold">~2034</span>
+                            </label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">$</span>
+                                <input type="number" id="costSurrogacy" class="input-field text-sm text-life" value="200000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 宏观配置 -->
                 <div class="panel p-5 bg-gray-50">
                     <h2 class="text-gray-900 font-bold mb-4 flex items-center gap-2 text-xs uppercase tracking-wider border-b border-gray-200 pb-2">
-                        <i class="ph-bold ph-binoculars text-purple-600"></i> 未来战略配置
+                        <i class="ph-bold ph-sliders-horizontal text-purple-600"></i> 现实摩擦 & 假设
                     </h2>
-                    
-                    <div class="space-y-6">
-                        <!-- 帆仓位比例 -->
+                    <div class="space-y-4">
                         <div>
                             <div class="flex justify-between mb-1">
-                                <label class="text-xs font-bold text-gray-600">未来帆仓位 (DCA Alts)</label>
-                                <span class="text-xs font-mono font-bold text-blue-600" id="disp-sail-alloc">60%</span>
+                                <label class="text-xs font-bold text-red-600">摩擦系数 (Friction)</label>
+                                <span class="text-xs font-mono font-bold text-red-600" id="disp-friction">20%</span>
                             </div>
-                            <input type="range" id="sailAlloc" min="30" max="80" step="5" value="60" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <p class="text-[10px] text-gray-400 mt-1">
-                                下一轮起：<span class="font-bold text-btc">40% 压舱</span> / <span class="font-bold text-blue-600">60% 进攻</span>
-                            </p>
+                            <input type="range" id="friction" min="0" max="40" step="5" value="20" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600">
+                            <p class="text-[10px] text-gray-400 mt-1">扣除 <span id="friction-val" class="font-bold text-red-500">20%</span> 利润 (税务/滑点/损耗)</p>
                         </div>
-
+                        <hr class="border-gray-200">
                         <div>
                             <div class="flex justify-between mb-1">
-                                <label class="text-xs font-bold text-gray-600">机会收窄 (Alpha Decay)</label>
+                                <label class="text-xs font-bold text-gray-600">未来帆仓位 (默认 50%)</label>
+                                <span class="text-xs font-mono font-bold text-blue-600" id="disp-sail-alloc">50%</span>
+                            </div>
+                            <input type="range" id="sailAlloc" min="30" max="80" step="5" value="50" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-[10px] text-gray-400 mt-1">默认: <span class="font-bold text-btc">50% 压舱</span> / <span class="font-bold text-blue-600">50% 进攻</span></p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-gray-600">机会收窄 (默认 20%)</label>
                                 <span class="text-xs font-mono font-bold text-purple-600" id="disp-decay">20%</span>
                             </div>
                             <input type="range" id="alphaDecay" min="0" max="50" step="5" value="20" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                            <p class="text-[10px] text-gray-400 mt-1">每轮超额收益减少 <span id="decay-val" class="font-bold">20%</span></p>
                         </div>
-
                         <div>
                             <div class="flex justify-between mb-1">
                                 <label class="text-xs font-bold text-gray-600">推演轮次</label>
                                 <span class="text-xs font-mono font-bold text-gray-800" id="disp-cycles">3 Cycles</span>
                             </div>
-                            <input type="range" id="simCycles" min="1" max="5" step="1" value="3" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-600">
+                            <input type="range" id="simCycles" min="2" max="5" step="1" value="3" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-600">
                         </div>
                     </div>
                 </div>
@@ -210,152 +245,138 @@
             <!-- 右侧：推演详情 (9列) -->
             <div class="xl:col-span-9 space-y-8">
                 
-                <!-- SECTION A: Cycle 1 深度复盘 -->
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded">CYCLE 1</span>
-                        <span class="text-sm font-bold text-gray-700">2025 (当前周期 - 激进模式)</span>
+                <!-- SECTION A: 收益率透视 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="panel p-4 border-l-4 border-l-btc relative overflow-hidden">
+                        <div class="text-[10px] text-gray-400 uppercase font-bold">您的策略 CAGR (年化)</div>
+                        <div class="text-3xl font-mono font-bold text-gray-900 mt-1" id="user-cagr">--%</div>
+                        <div class="text-xs text-green-600 font-bold mt-1">远超巴菲特 (20%)</div>
+                        <i class="ph-fill ph-rocket-launch absolute right-2 top-2 text-4xl text-gray-100 -z-10"></i>
+                    </div>
+                    <div class="panel p-4 border-l-4 border-l-red-500 bg-red-50/30">
+                        <div class="text-[10px] text-gray-400 uppercase font-bold">总摩擦损耗 (Estimated)</div>
+                        <div class="text-xl font-mono font-bold text-red-600 mt-1" id="total-friction-cost">-- BTC</div>
+                        <div class="text-xs text-gray-500">税务 & 滑点成本</div>
+                    </div>
+                    <div class="panel p-4 border-l-4 border-l-green-500 bg-green-50/30">
+                        <div class="text-[10px] text-gray-400 uppercase font-bold">最终净资产 (BTC)</div>
+                        <div class="text-2xl font-mono font-bold text-gray-900 mt-1" id="end-total-btc">-- BTC</div>
+                        <div class="text-xs text-green-600 font-bold" id="end-total-usd">价值: $--</div>
+                    </div>
+                </div>
+
+                <!-- SECTION B: 人生目标达成推演 -->
+                <div class="space-y-4 pt-2">
+                    <div class="flex justify-between items-end">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-life text-white text-xs font-bold px-2 py-0.5 rounded">LIFE GOALS</span>
+                            <span class="text-sm font-bold text-gray-700">人生大事资金压力测试 (含摩擦成本)</span>
+                        </div>
                     </div>
 
-                    <!-- 1. 起点 -->
-                    <div class="panel p-5 flex flex-col gap-4 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="text-[10px] text-gray-400 uppercase font-bold">Phase 1: 起点</div>
-                                <div class="text-2xl font-mono font-bold text-gray-900" id="c1-start-btc">-- BTC</div>
-                                <div class="text-xs text-gray-500 font-mono" id="c1-start-usd">$ --</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold">资产占比 (Value)</div>
-                                <div class="flex gap-2 mt-1" id="c1-start-pcts">
-                                    <!-- Injected -->
+                        <!-- 1. 妈妈装修 + 医疗 -->
+                        <div class="panel p-5 border border-family/30 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                                        <i class="ph-fill ph-house text-family text-lg"></i> 装修 + 医疗备用
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">建议时间: 2026</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-mono font-bold text-family" id="disp-mom-total">$-</div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- 比例柱 -->
-                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-start">
-                            <!-- Injected -->
-                        </div>
-                        
-                        <!-- 详情 -->
-                        <div class="grid grid-cols-3 gap-4 text-xs pt-2 border-t border-gray-50">
-                            <div>
-                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-btc rounded-full"></div>BTC</div>
-                                <div class="font-mono font-bold text-gray-700" id="c1-start-btc-val">--</div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="bar-mom" class="h-full bg-family" style="width: 0%"></div>
                             </div>
-                            <div>
-                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-eth rounded-full"></div>ETH</div>
-                                <div class="font-mono font-bold text-gray-700" id="c1-start-eth-val">--</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-400 mb-1 flex items-center gap-1"><div class="w-1.5 h-1.5 bg-ada rounded-full"></div>ADA</div>
-                                <div class="font-mono font-bold text-gray-700" id="c1-start-ada-val">--</div>
+                            <div class="flex justify-between mt-1.5 text-[10px]">
+                                <span class="text-gray-500">占 Cycle 1 净值的 <span id="pct-mom" class="font-bold text-family">--%</span></span>
+                                <span class="text-green-600 font-bold">毫无压力 ✔</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="connector-line"></div>
-
-                    <!-- 2. 牛顶收割 -->
-                    <div class="panel p-5 flex flex-col gap-4 relative border-l-4 border-l-red-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="text-[10px] text-red-500 uppercase font-bold">Phase 2: 牛顶</div>
-                                <div class="text-2xl font-mono font-bold text-gray-900" id="c1-bull-btc">-- BTC</div>
-                                <div class="text-xs text-gray-500 font-mono">Val: <span id="c1-bull-usd">--</span></div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold">峰值占比</div>
-                                <div class="flex gap-2 mt-1" id="c1-bull-pcts">
-                                    <!-- Injected -->
+                        <!-- 2. 冻卵 (Cycle 2 End) -->
+                        <div class="panel p-5 border border-life/30 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                                        <i class="ph-fill ph-snowflake text-life text-lg"></i> 2030 冻卵
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">时间: ~2030</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-mono font-bold text-life" id="disp-egg-cost">$-</div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- 比例柱 -->
-                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-bull">
-                            <!-- Injected -->
-                        </div>
-
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
-                            <div class="text-xs text-gray-400">
-                                策略：<span class="text-red-500 font-bold">卖出 ETH/ADA</span>, <span class="text-gray-700 font-bold">保留 BTC</span>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="bar-egg" class="h-full bg-life" style="width: 0%"></div>
                             </div>
-                            <div class="bg-green-50 border border-green-200 rounded px-3 py-1 text-right">
-                                <div class="text-[10px] text-green-600 font-bold uppercase">收获 USDT</div>
-                                <div class="text-base font-mono font-black text-green-600" id="c1-ammo">$--</div>
+                            <div class="flex justify-between mt-1.5 text-[10px]">
+                                <span class="text-gray-500">占 Cycle 2 净值的 <span id="pct-egg" class="font-bold text-life">--%</span></span>
+                                <span class="text-green-600 font-bold">覆盖 ✔</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="connector-line"></div>
-
-                    <!-- 3. 熊底重仓 -->
-                    <div class="panel p-5 flex flex-col gap-4 border-l-4 border-l-usdt bg-gradient-to-r from-green-50/30 to-white">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="text-[10px] text-green-600 uppercase font-bold">Phase 3: 熊底 (100% BTC)</div>
-                                <div class="text-3xl font-mono font-bold text-gray-900" id="c1-end-btc">-- BTC</div>
-                                <div class="text-xs text-gray-500 font-mono">Val: <span id="c1-end-usd">--</span></div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-400 uppercase font-bold">BTC 来源构成</div>
-                                <div class="flex gap-2 mt-1" id="c1-end-pcts">
-                                    <!-- Injected -->
+                        <!-- 3. 上海买房 -->
+                        <div class="panel p-5 border border-house/30 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                                        <i class="ph-fill ph-buildings text-house text-lg"></i> 上海置业储备
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">时间: 灵活 (2034+)</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-mono font-bold text-house" id="disp-shanghai-cost">$-</div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- 比例柱 (BTC 构成) -->
-                        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex shadow-inner text-[9px] text-white font-bold leading-4 text-center" id="bar-end">
-                            <!-- Injected -->
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 text-xs pt-2 border-t border-gray-50">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-500 font-bold flex items-center gap-1"><div class="w-1.5 h-1.5 bg-btc rounded-full"></div>老本 (Anchor)</span>
-                                <span class="font-mono font-bold text-gray-900" id="c1-res-anchor">--</span>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="bar-shanghai" class="h-full bg-house" style="width: 0%"></div>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-green-600 font-bold flex items-center gap-1"><div class="w-1.5 h-1.5 bg-usdt rounded-full"></div>利润 (New Sail)</span>
-                                <span class="font-mono font-bold text-green-700" id="c1-res-sail">--</span>
+                            <div class="flex justify-between mt-1.5 text-[10px]">
+                                <span class="text-gray-500">占 Cycle 3 净值的 <span id="pct-shanghai" class="font-bold text-house">--%</span></span>
+                                <span class="text-green-600 font-bold">从容 ✔</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. 代孕 (Cycle 3 End) -->
+                        <div class="panel p-5 border border-life/30 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                                        <i class="ph-fill ph-baby-carriage text-life text-lg"></i> 2034 美国代孕
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">时间: ~2034</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-mono font-bold text-life" id="disp-surro-cost">$-</div>
+                                </div>
+                            </div>
+                            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="bar-surro" class="h-full bg-life" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between mt-1.5 text-[10px]">
+                                <span class="text-gray-500">占 Cycle 3 净值的 <span id="pct-surro" class="font-bold text-life">--%</span></span>
+                                <span class="text-green-600 font-bold">覆盖 ✔</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION B: 宏观未来 -->
-                <div class="space-y-4 pt-6 border-t border-gray-200">
-                    <div class="flex justify-between items-end">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded">FUTURE</span>
-                            <span class="text-sm font-bold text-gray-700">宏观财富路径推演 (4年减半周期)</span>
+                <!-- 宏观图表 -->
+                <div class="panel p-6 h-80 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">财富增长曲线 vs 巴菲特线</h3>
+                        <div class="flex gap-4 text-[10px]">
+                             <div class="flex items-center gap-1"><span class="w-3 h-0.5 bg-blue-600"></span> 您的策略</div>
+                             <div class="flex items-center gap-1"><span class="w-3 h-0.5 bg-gray-400 dashed border-b border-gray-400"></span> 巴菲特 (20%/年)</div>
                         </div>
-                        <div class="text-xs text-gray-400">基于 <span id="lbl-sail-alloc" class="font-bold text-blue-600">60%</span> 帆仓位配置</div>
                     </div>
-
-                    <!-- 终极图表 -->
-                    <div class="panel p-6 h-80 bg-white">
+                    <div class="h-full w-full">
                         <canvas id="macroChart"></canvas>
-                    </div>
-
-                    <!-- 汇总数据 -->
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="panel p-4 bg-gray-50">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Cycle 1 净增</div>
-                            <div class="text-xl font-mono font-bold text-green-600" id="gain-c1">-- BTC</div>
-                        </div>
-                        <div class="panel p-4 bg-gray-50">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">后续轮次复利</div>
-                            <div class="text-xl font-mono font-bold text-purple-600" id="gain-future">-- BTC</div>
-                        </div>
-                        <div class="panel p-4 bg-gray-900 text-white">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">最终总资产</div>
-                            <div class="text-2xl font-mono font-bold text-btc" id="gain-total">-- BTC</div>
-                        </div>
                     </div>
                 </div>
 
@@ -365,12 +386,15 @@
 
 <script>
     // --- State ---
+    // IMPORTANT: Default values here, but will be overwritten by localStorage if available
     const state = {
         holdings: { btc: 0.0871, eth: 4.5603, ada: 45029.7432 },
         prices: { btc: 0, eth: 0, ada: 0 },
         targets: { btc: 150000, eth: 8000, ada: 5 },
         bear: { buyPrice: 69000 },
-        macro: { decay: 0.20, cycles: 3, sailAlloc: 0.60 },
+        // Defaults: Sail 50%, Decay 20%, Friction 20%
+        macro: { decay: 0.20, cycles: 3, sailAlloc: 0.50, friction: 0.20 },
+        life: { costMomHouse: 10000, costMedical: 30000, costEgg: 20000, costShanghai: 500000, costSurrogacy: 200000 },
         ahr: { value: 0 }
     };
 
@@ -396,69 +420,111 @@
 
     function updateInputs() {
         const setVal = (id, val) => { const el = $(id); if(el) el.value = val; };
+        const setTxt = (id, txt) => { const el = $(id); if(el) el.textContent = txt; };
+        
+        // Holdings
         setVal('currentBtc', state.holdings.btc);
         setVal('currentEth', state.holdings.eth);
         setVal('currentAda', state.holdings.ada);
+        
+        // Targets
         setVal('bullBtcPrice', state.targets.btc);
         setVal('bullEthPrice', state.targets.eth);
         setVal('bullAdaPrice', state.targets.ada);
         setVal('bearBuyPrice', state.bear.buyPrice);
-        setVal('alphaDecay', state.macro.decay * 100);
-        setVal('simCycles', state.macro.cycles);
-        setVal('sailAlloc', state.macro.sailAlloc * 100);
         
-        $('disp-decay').textContent = (state.macro.decay * 100) + '%';
-        $('decay-val').textContent = (state.macro.decay * 100) + '%';
-        $('disp-cycles').textContent = state.macro.cycles + ' Cycles';
-        $('disp-sail-alloc').textContent = (state.macro.sailAlloc * 100) + '%';
-        $('lbl-sail-alloc').textContent = (state.macro.sailAlloc * 100) + '%';
+        // Macro
+        setVal('alphaDecay', state.macro.decay * 100);
+        setVal('sailAlloc', state.macro.sailAlloc * 100);
+        setVal('simCycles', state.macro.cycles);
+        setVal('friction', state.macro.friction * 100);
+        
+        // Life
+        setVal('costMomHouse', state.life.costMomHouse);
+        setVal('costMedical', state.life.costMedical);
+        setVal('costEgg', state.life.costEgg);
+        setVal('costShanghai', state.life.costShanghai);
+        setVal('costSurrogacy', state.life.costSurrogacy);
+        
+        // Labels
+        const dispDecay = $('disp-decay'); if(dispDecay) dispDecay.textContent = (state.macro.decay * 100) + '%';
+        const decayVal = $('decay-val'); if(decayVal) decayVal.textContent = (state.macro.decay * 100) + '%';
+        const dispSail = $('disp-sail-alloc'); if(dispSail) dispSail.textContent = (state.macro.sailAlloc * 100) + '%';
+        const lblSail = $('lbl-sail-alloc'); if(lblSail) lblSail.textContent = (state.macro.sailAlloc * 100) + '%';
+        const dispCycles = $('disp-cycles'); if(dispCycles) dispCycles.textContent = state.macro.cycles + ' Cycles';
+        const dispFric = $('disp-friction'); if(dispFric) dispFric.textContent = (state.macro.friction * 100) + '%';
+        const fricVal = $('friction-val'); if(fricVal) fricVal.textContent = (state.macro.friction * 100) + '%';
     }
 
     function bindEvents() {
         const onIn = (id, cb) => { const el = $(id); if(el) el.addEventListener('input', cb); };
         
-        onIn('currentBtc', e => { state.holdings.btc = parseFloat(e.target.value) || 0; update(); });
-        onIn('currentEth', e => { state.holdings.eth = parseFloat(e.target.value) || 0; update(); });
-        onIn('currentAda', e => { state.holdings.ada = parseFloat(e.target.value) || 0; update(); });
+        // Holdings
+        ['currentBtc', 'currentEth', 'currentAda'].forEach(k => 
+            onIn(k, e => { state.holdings[k.replace('current','').toLowerCase()] = parseFloat(e.target.value) || 0; update(); })
+        );
         
-        onIn('bullBtcPrice', e => { state.targets.btc = parseFloat(e.target.value) || 0; update(); });
-        onIn('bullEthPrice', e => { state.targets.eth = parseFloat(e.target.value) || 0; update(); });
-        onIn('bullAdaPrice', e => { state.targets.ada = parseFloat(e.target.value) || 0; update(); });
+        // Targets
+        ['bullBtcPrice', 'bullEthPrice', 'bullAdaPrice'].forEach(k => 
+            onIn(k, e => { 
+                const key = k.replace('bull','').replace('Price','').toLowerCase();
+                state.targets[key] = parseFloat(e.target.value) || 0; 
+                update(); 
+            })
+        );
+        
         onIn('bearBuyPrice', e => { state.bear.buyPrice = parseFloat(e.target.value) || 0; update(); });
 
+        // Macro
         onIn('alphaDecay', e => { 
             state.macro.decay = parseInt(e.target.value) / 100; 
-            $('disp-decay').textContent = e.target.value + '%';
-            $('decay-val').textContent = e.target.value + '%';
+            const disp = $('disp-decay'); if(disp) disp.textContent = e.target.value + '%';
+            const val = $('decay-val'); if(val) val.textContent = e.target.value + '%';
             update(); 
         });
-        
-        onIn('simCycles', e => { 
-            state.macro.cycles = parseInt(e.target.value); 
-            $('disp-cycles').textContent = e.target.value + ' Cycles';
+        onIn('sailAlloc', e => {
+            state.macro.sailAlloc = parseInt(e.target.value) / 100;
+            const disp = $('disp-sail-alloc'); if(disp) disp.textContent = e.target.value + '%';
+            const lbl = $('lbl-sail-alloc'); if(lbl) lbl.textContent = e.target.value + '%';
+            update();
+        });
+        onIn('simCycles', e => {
+            state.macro.cycles = parseInt(e.target.value);
+            const disp = $('disp-cycles'); if(disp) disp.textContent = e.target.value + ' Cycles';
+            update();
+        });
+        onIn('friction', e => { 
+            state.macro.friction = parseInt(e.target.value) / 100; 
+            const disp = $('disp-friction'); if(disp) disp.textContent = e.target.value + '%';
+            const val = $('friction-val'); if(val) val.textContent = e.target.value + '%';
             update(); 
         });
 
-        onIn('sailAlloc', e => {
-            state.macro.sailAlloc = parseInt(e.target.value) / 100;
-            $('disp-sail-alloc').textContent = e.target.value + '%';
-            $('lbl-sail-alloc').textContent = e.target.value + '%';
-            update();
-        });
+        // Life
+        ['costMomHouse', 'costMedical', 'costEgg', 'costShanghai', 'costSurrogacy'].forEach(k =>
+            onIn(k, e => { state.life[k] = parseFloat(e.target.value) || 0; update(); })
+        );
 
         const btn = $('refresh-btn');
         if(btn) btn.addEventListener('click', fetchData);
     }
 
-    function saveState() { localStorage.setItem('gemini_sail_v5_3', JSON.stringify(state)); }
+    // Use a new key to ensure fresh defaults on first run of this version
+    const STORAGE_KEY = 'gemini_sail_v5_8_autosave';
+
+    function saveState() { 
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); 
+    }
+    
     function loadState() {
-        const saved = localStorage.getItem('gemini_sail_v5_3');
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
             state.holdings = { ...state.holdings, ...parsed.holdings };
             state.targets = { ...state.targets, ...parsed.targets };
             state.bear = { ...state.bear, ...parsed.bear };
             state.macro = { ...state.macro, ...parsed.macro };
+            if(parsed.life) state.life = { ...state.life, ...parsed.life };
         }
     }
 
@@ -504,138 +570,136 @@
         if (!state.prices.btc) return;
 
         // --- Cycle 1 Calculation ---
-        // Start Values (USD)
         const c1_val_btc = state.holdings.btc * state.prices.btc;
         const c1_val_eth = state.holdings.eth * state.prices.eth;
         const c1_val_ada = state.holdings.ada * state.prices.ada;
         const c1_start_usd = c1_val_btc + c1_val_eth + c1_val_ada;
         const c1_start_btc_eq = c1_start_usd / state.prices.btc;
         
-        const pct_start_btc = c1_val_btc / c1_start_usd * 100;
-        const pct_start_eth = c1_val_eth / c1_start_usd * 100;
-        const pct_start_ada = c1_val_ada / c1_start_usd * 100;
-
-        // Bull Values (USD)
-        const c1_bull_btc = state.holdings.btc * state.targets.btc; // Held
         const c1_bull_eth = state.holdings.eth * state.targets.eth;
         const c1_bull_ada = state.holdings.ada * state.targets.ada;
-        const c1_ammo = c1_bull_eth + c1_bull_ada;
-        const c1_bull_usd = c1_bull_btc + c1_ammo;
-        const c1_bull_btc_eq = c1_bull_usd / state.targets.btc;
-
-        const pct_bull_btc = c1_bull_btc / c1_bull_usd * 100;
-        const pct_bull_eth = c1_bull_eth / c1_bull_usd * 100;
-        const pct_bull_ada = c1_bull_ada / c1_bull_usd * 100;
-
-        // Bear (End of C1)
+        let c1_ammo = c1_bull_eth + c1_bull_ada;
+        
+        // Friction
+        const friction = 1 - state.macro.friction;
+        c1_ammo *= friction; 
+        
+        const c1_bull_usd = (state.holdings.btc * state.targets.btc) + c1_ammo;
+        
         const c1_new_btc = c1_ammo / state.bear.buyPrice;
         const c1_end_btc = state.holdings.btc + c1_new_btc;
         const c1_end_usd = c1_end_btc * state.bear.buyPrice;
 
-        const pct_end_anchor = (state.holdings.btc / c1_end_btc) * 100;
-        const pct_end_sail = (c1_new_btc / c1_end_btc) * 100;
-
-        // Alpha Logic (Sail Performance)
         const sail_start_btc_eq = (c1_val_eth + c1_val_ada) / state.prices.btc;
         const c1_alpha = sail_start_btc_eq > 0 ? c1_new_btc / sail_start_btc_eq : 1;
 
         // --- Macro Loop (Cycle 2+) ---
         const chartLabels = ['起点 (2025)'];
         const chartData = [c1_start_btc_eq];
+        const buffettData = [c1_start_btc_eq];
+        const annotations = {};
+        
         let currentBtc = c1_end_btc;
         let currentAlpha = c1_alpha;
         
         chartLabels.push('Cycle 1 (~2026)');
         chartData.push(c1_end_btc);
+        buffettData.push(c1_start_btc_eq * Math.pow(1.2, 2)); 
+
+        // Bear Price Growth Assumption
+        let currentBearPrice = state.bear.buyPrice;
+        let totalFrictionBtc = (c1_bull_eth + c1_bull_ada) * state.macro.friction / state.bear.buyPrice;
+        
+        let valCycle2 = 0;
+        let valCycle3 = 0;
 
         for(let i=2; i<=state.macro.cycles; i++) {
             const startYear = 2025 + (i-1)*4;
-            chartLabels.push(`Cycle ${i} (~${startYear+1})`);
+            const endYear = startYear + 4;
+            chartLabels.push(`Cycle ${i} (~${endYear})`);
             
-            // Apply Decay to Alpha
             currentAlpha = 1 + ((currentAlpha - 1) * (1 - state.macro.decay));
             if(currentAlpha < 1) currentAlpha = 1;
             
-            // Configurable Split for Future Cycles
-            const sailRatio = state.macro.sailAlloc; // e.g., 0.6
-            const anchorRatio = 1 - sailRatio;       // e.g., 0.4
+            const sailRatio = state.macro.sailAlloc;
+            const anchorRatio = 1 - sailRatio;
             
             const anchor = currentBtc * anchorRatio;
             const sail = currentBtc * sailRatio;
+            const newSail = (sail * currentAlpha) * friction; 
             
-            // Sail grows by Alpha
-            const newSail = sail * currentAlpha;
+            totalFrictionBtc += (sail * currentAlpha) * state.macro.friction;
+
             currentBtc = anchor + newSail;
             
             chartData.push(currentBtc);
-        }
+            buffettData.push(c1_start_btc_eq * Math.pow(1.2, 2 + (i-1)*4));
+            
+            currentBearPrice *= 1.5;
 
-        // --- Render UI ---
-        const setTxt = (id, txt) => { const el = $(id); if(el) el.textContent = txt; };
+            if (i === 2) { 
+                valCycle2 = currentBtc * currentBearPrice; 
+                annotations['goal2030'] = { index: 2, label: '2030: 冻卵/买房' };
+            }
+            if (i === 3) { 
+                valCycle3 = currentBtc * currentBearPrice;
+                annotations['goal2034'] = { index: 3, label: '2034: 代孕' };
+            }
+        }
         
-        // Phase 1 Render
+        // Calculate CAGR
+        const years = (state.macro.cycles - 1) * 4 + 2; 
+        const cagr = (Math.pow(currentBtc / c1_start_btc_eq, 1/years) - 1) * 100;
+
+        // --- Render Cycle 1 Details ---
+        const setTxt = (id, txt) => { const el = $(id); if(el) el.textContent = txt; };
         setTxt('c1-start-btc', fmt.btc(c1_start_btc_eq));
         setTxt('c1-start-usd', fmt.usd(c1_start_usd));
-        $('c1-start-pcts').innerHTML = `
-            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_start_btc)}</span>
-            <span class="text-[10px] font-bold text-eth bg-purple-50 px-1 rounded">${fmt.pct(pct_start_eth)}</span>
-            <span class="text-[10px] font-bold text-ada bg-blue-50 px-1 rounded">${fmt.pct(pct_start_ada)}</span>
-        `;
-        $('bar-start').innerHTML = `
-            <div style="width:${pct_start_btc}%" class="bar-segment bg-btc h-full flex items-center justify-center" title="BTC">${pct_start_btc>10?'BTC':''}</div>
-            <div style="width:${pct_start_eth}%" class="bar-segment bg-eth h-full flex items-center justify-center" title="ETH">${pct_start_eth>10?'ETH':''}</div>
-            <div style="width:${pct_start_ada}%" class="bar-segment bg-ada h-full flex items-center justify-center" title="ADA">${pct_start_ada>10?'ADA':''}</div>
-        `;
-        setTxt('c1-start-btc-val', fmt.num(state.holdings.btc, 4));
-        setTxt('c1-start-eth-val', fmt.num(state.holdings.eth));
-        setTxt('c1-start-ada-val', fmt.num(state.holdings.ada, 0));
-
-        // Phase 2 Render
-        setTxt('c1-bull-btc', fmt.btc(c1_bull_btc_eq));
-        setTxt('c1-bull-usd', fmt.usd(c1_bull_usd));
-        $('c1-bull-pcts').innerHTML = `
-            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_bull_btc)}</span>
-            <span class="text-[10px] font-bold text-eth bg-purple-50 px-1 rounded">${fmt.pct(pct_bull_eth)}</span>
-            <span class="text-[10px] font-bold text-ada bg-blue-50 px-1 rounded">${fmt.pct(pct_bull_ada)}</span>
-        `;
-        $('bar-bull').innerHTML = `
-            <div style="width:${pct_bull_btc}%" class="bar-segment bg-btc h-full opacity-60 flex items-center justify-center">BTC</div>
-            <div style="width:${pct_bull_eth}%" class="bar-segment bg-eth h-full flex items-center justify-center">ETH</div>
-            <div style="width:${pct_bull_ada}%" class="bar-segment bg-ada h-full flex items-center justify-center">ADA</div>
-        `;
         setTxt('c1-ammo', fmt.usd(c1_ammo));
-
-        // Phase 3 Render
         setTxt('c1-end-btc', fmt.btc(c1_end_btc));
         setTxt('c1-end-usd', fmt.usd(c1_end_usd));
-        $('c1-end-pcts').innerHTML = `
-            <span class="text-[10px] font-bold text-btc bg-orange-50 px-1 rounded">${fmt.pct(pct_end_anchor)}</span>
-            <span class="text-[10px] font-bold text-usdt bg-green-50 px-1 rounded">${fmt.pct(pct_end_sail)}</span>
-        `;
-        $('bar-end').innerHTML = `
-            <div style="width:${pct_end_anchor}%" class="bar-segment bg-btc h-full flex items-center justify-center">老本</div>
-            <div style="width:${pct_end_sail}%" class="bar-segment bg-usdt h-full flex items-center justify-center">利润</div>
-        `;
-        setTxt('c1-res-anchor', fmt.btc(state.holdings.btc));
-        setTxt('c1-res-sail', '+' + fmt.btc(c1_new_btc));
+        
+        // Stats
+        setTxt('user-cagr', cagr.toFixed(1) + '%');
+        setTxt('total-friction-cost', '-' + fmt.btc(totalFrictionBtc) + ' BTC');
+        setTxt('end-total-btc', fmt.btc(currentBtc));
+        setTxt('end-total-usd', '价值: ' + fmt.usd(currentBtc * currentBearPrice));
 
-        // Macro Stats
-        setTxt('gain-c1', '+' + fmt.btc(c1_end_btc - c1_start_btc_eq));
-        setTxt('gain-future', '+' + fmt.btc(currentBtc - c1_end_btc));
-        setTxt('gain-total', fmt.btc(currentBtc));
+        // --- Render Life Goals ---
+        const renderBar = (barId, pctId, cost, assetVal, statusId) => {
+            const pct = assetVal > 0 ? (cost / assetVal) * 100 : 0;
+            const bar = $(barId);
+            if(bar) bar.style.width = Math.min(pct, 100) + '%';
+            setTxt(pctId, pct.toFixed(2) + '%');
+            if(statusId) {
+                const el = $(statusId);
+                if (el) {
+                    if(pct > 50) { el.textContent = "压力较大"; el.className = "text-red-500 font-bold"; }
+                    else if(pct > 20) { el.textContent = "需要规划"; el.className = "text-yellow-600 font-bold"; }
+                    else { el.textContent = "轻松覆盖 ✔"; el.className = "text-green-600 font-bold"; }
+                }
+            }
+        };
 
-        renderChart(chartLabels, chartData, c1_start_btc_eq);
+        const momTotal = state.life.costMomHouse + state.life.costMedical;
+        setTxt('disp-mom-total', fmt.usd(momTotal));
+        renderBar('bar-mom', 'pct-mom', momTotal, c1_end_usd, null);
+
+        setTxt('disp-egg-cost', fmt.usd(state.life.costEgg));
+        renderBar('bar-egg', 'pct-egg', state.life.costEgg, valCycle2, null);
+
+        setTxt('disp-shanghai-cost', fmt.usd(state.life.costShanghai));
+        renderBar('bar-shanghai', 'pct-shanghai', state.life.costShanghai, valCycle3, 'shanghai-status');
+
+        setTxt('disp-surro-cost', fmt.usd(state.life.costSurrogacy));
+        renderBar('bar-surro', 'pct-surro', state.life.costSurrogacy, valCycle3, 'surro-status');
+
+        renderChart(chartLabels, chartData, buffettData, annotations);
     }
 
-    function renderChart(labels, data, startBtc) {
+    function renderChart(labels, data, buffettData, annotations) {
         const ctx = $('macroChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
-
-        const hodlData = Array(labels.length).fill(startBtc);
-
-        // Colors
-        const brandColor = '#2563EB'; // Blue
-        const hodlColor = '#9CA3AF'; // Gray
 
         chartInstance = new Chart(ctx, {
             type: 'line',
@@ -643,26 +707,24 @@
                 labels: labels,
                 datasets: [
                     {
-                        label: '策略复利增长',
+                        label: '锚与帆策略 (扣除摩擦后)',
                         data: data,
-                        borderColor: brandColor,
+                        borderColor: '#2563EB',
                         backgroundColor: 'rgba(37, 99, 235, 0.1)',
                         borderWidth: 3,
                         tension: 0.3,
                         fill: true,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: brandColor,
+                        pointBorderColor: '#2563EB',
                         pointRadius: 6,
-                        pointHoverRadius: 8
                     },
                     {
-                        label: '躺平持币 (Hodl)',
-                        data: hodlData,
-                        borderColor: hodlColor,
+                        label: '巴菲特基准 (20%/年)',
+                        data: buffettData,
+                        borderColor: '#4B5563',
                         borderWidth: 2,
                         borderDash: [6, 6],
                         pointRadius: 0,
-                        pointHoverRadius: 0,
                         tension: 0,
                         fill: false
                     }
@@ -682,6 +744,24 @@
                         callbacks: {
                             label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(2)} BTC`
                         }
+                    },
+                    annotation: {
+                        annotations: Object.keys(annotations).map(key => ({
+                            type: 'line',
+                            scaleID: 'x',
+                            value: annotations[key].index,
+                            borderColor: '#EC4899',
+                            borderWidth: 1,
+                            borderDash: [4, 4],
+                            label: {
+                                display: true,
+                                content: annotations[key].label,
+                                position: 'start',
+                                backgroundColor: '#EC4899',
+                                color: 'white',
+                                font: { size: 10, weight: 'bold' }
+                            }
+                        }))
                     }
                 },
                 scales: {
